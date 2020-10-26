@@ -17,10 +17,38 @@ This module provides functions to calculate the intrinsic rate constants between
 
 Besides, the module also provides the efficiency of TADF material and the exciton concentration.
 
+### Utilty function
 `tau2k`
-
 `k2tau`
-
 `exponential_ratio`
-
 `phi_PF_DF`
+
+### intrinsic rate constant calculator
+`IntrinsicRateConstants_Determined`
+`IntrinsicRateConstants`
+
+### phi function
+`phi_sr_snr_isc`
+`phi_tr_tnr_risc`
+
+### Internal Quantum Efficiency (IQE)
+`IQE_PurcellEffect`
+`IQE_RateConstants`
+`IQE_Phi`
+`IQE_PLQY`
+
+### Differential Equations
+`PLQY_phi`
+`k_total`
+`kPF_kDF`
+`Concentration_SteadyState`
+`ConcentrationRatio_SteadyState`
+`PulseResponse`
+
+### script
+`script_for_100_PLQY`
+`script`
+`pulseresponse_script`
+
+
+
