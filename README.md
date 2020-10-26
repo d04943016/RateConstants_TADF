@@ -5,8 +5,7 @@ This module would use numpy and matplotlib, so please install these two modules 
 
     pip install numpy and matplotlib
 
-Ref.
-
+Ref.<br/>
 [1] https://onlinelibrary.wiley.com/doi/abs/10.1002/adfm.201602501 <br/>
 [2] https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201601675 <br/>
 [3] https://pubs.rsc.org/no/content/articlelanding/2015/cc/c5cc05022g/unauth#!divAbstract <br/>
