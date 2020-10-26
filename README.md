@@ -17,10 +17,10 @@ This module provides functions to calculate the intrinsic rate constants between
 
 Besides, the module also provides the efficiency of TADF material and the exciton concentration.
 
-'tau2k'
+`tau2k`
 
-'k2tau'
+`k2tau`
 
-'exponential_ratio'
+`exponential_ratio`
 
-'phi_PF_DF'
+`phi_PF_DF`
