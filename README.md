@@ -48,17 +48,33 @@ and photoluminescence quantum yield (PLQY, phi_PF, phi_DF).
 output : ksr (radiative rate constant from singlet state), ks (total rate constant from singlet state), kt (total rate constant from triplet state), kisckrisc (a product of the intersystem rate constant and the reverse intersystem crossing rate constant)
 
 `RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)`<br/>
-
+a function to calculate the rate constants which cannot be calculated directly from the experimental data and should considering a the loss ratio from triplet state by PL excitation (phi_Tnr_PL)
+    
+    ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc = RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)
 
 #### phi function
 `RCC.phi_sr_snr_isc(ksr, ksnr, kisc)`<br/>
+phi_sr_snr_isc is a function to calculate the efficiency of each process in S1
+
 `RCC.phi_tr_tnr_risc(ktr, ktnr, krisc)`<br/>
+phi_tr_tnr_risc is a function to calculate the efficiency of each process in T1
 
 #### Internal Quantum Efficiency (IQE)
 `RCC.IQE_PurcellEffect(IQE, F=1.0)`<br/>
+a function to calculate the internal quantum yield considering Purcell effect. 
+IQE : internal quantum yield (PL excitation)
+F : Purcell factor
+
 `RCC.IQE_RateConstants(ksr, kt, krisc, kPF, kDF, alpha=1.0, F=1.0)`<br/>
+a function to calculate the internal quantum yield considering Purcell effect. 
+alpha : singlet pumping ratio (PL : alpha = 1.0, EL : alpha = 0.25)
+F : Purcell factor
+
 `RCC.IQE_Phi(phi_sr, phi_isc, phi_risc, alpha=1.0, F=1.0)`<br/>
+a function to calculate the internal quantum efficiency given with intrinsic state efficiency
+
 `RCC.IQE_PLQY(phi_risc, PLQY, alpha=1.0, F=1.0)`<br/>
+ a function to calculate the internal quantum efficiency given with PLQY
 
 #### Differential Equations
 `RCC.PLQY_phi(phi_sr, phi_isc, phi_risc)`<br/>
@@ -70,7 +86,11 @@ output : ksr (radiative rate constant from singlet state), ks (total rate consta
 
 #### script
 `RCC.script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name='')`<br/>
+analyzer for PLQY=100%
+
 `RCC.script(tau_PF, tau_DF, phi_PF, phi_DF, name='')`<br/>
+analyzer for PLQY not equal to 100%
+
 `RCC.pulseresponse_script(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, name='')`<br/>
 
 
