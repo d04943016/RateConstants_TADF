@@ -1,6 +1,10 @@
 # RateConstants_TADF
 Intrinsic rate constants extraction for thermally activated delayed fluorescence (two delayed components)
 
+This module would use numpy and matplotlib, so please install these two modules first.
+
+    pip install numpy and matplotlib
+
 Ref.
 
 [1] https://onlinelibrary.wiley.com/doi/abs/10.1002/adfm.201602501 
@@ -13,6 +17,10 @@ This module provides functions to calculate the intrinsic rate constants between
 
 Besides, the module also provides the efficiency of TADF material and the exciton concentration.
 
+"tau2k"
 
+"k2tau"
 
+"exponential_ratio"
 
+"phi_PF_DF"
