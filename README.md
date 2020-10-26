@@ -21,13 +21,34 @@ Besides, the module also provides the efficiency of TADF material and the excito
     
 #### Utilty function
 `RCC.tau2k(tau)`<br/>
+a function to calculate rate constant (k) from lifetime (tau).
+
 `RCC.k2tau(k)`<br/>
+a function to calculate lifetime from (tau) rate constant (k).
+
 `RCC.exponential_ratio(tau_Array, B_Array)`<br/>
+a function to calculate the relative ratio of each exponent
+
 `RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)`<br/>
+a function to calculate the quantum efficiency contributed from prompt fluorescence and the delayed fluorescence
 
 #### intrinsic rate constant calculator
 `RCC.IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)`<br/>
+a function to calculate the intrinsice rate constants that can be determined by kPF (rate constant of prompt fluorescence), kDF (rate constant of delayed fluorescence), phi_PF (prompt fluorescence quantum yield) and phi_DF (delayed fluorescence quantum yield). <br/>
+These four values (kPF, kDF, phi_PF, phi_DF) can be directly extracted from the transient data 
+
+    kPF=RCC.tau2k(tauPF)
+    kDF=RCC.tau2k(tauDF) 
+    
+and photoluminescence quantum yield (PLQY, phi_PF, phi_DF).
+
+    [phi_PF, phi_DF] = RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)
+    ksr, ks, kt, kisckrisc = RCC.IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)
+    
+output : ksr (radiative rate constant from singlet state), ks (total rate constant from singlet state), kt (total rate constant from triplet state), kisckrisc (a product of the intersystem rate constant and the reverse intersystem crossing rate constant)
+
 `RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)`<br/>
+
 
 #### phi function
 `RCC.phi_sr_snr_isc(ksr, ksnr, kisc)`<br/>
