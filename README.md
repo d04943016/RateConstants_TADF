@@ -14,29 +14,31 @@ This module provides functions to calculate the intrinsic rate constants between
 
 Besides, the module also provides the efficiency of TADF material and the exciton concentration.
 
+## RateConstantsCalculator Module
+
     import RateConstantsCalculator as RCC
     
-### Utilty function
+#### Utilty function
 `RCC.tau2k`<br/>
 `RCC.k2tau`<br/>
 `RCC.exponential_ratio`<br/>
 `RCC.phi_PF_DF`<br/>
 
-### intrinsic rate constant calculator
+#### intrinsic rate constant calculator
 `RCC.IntrinsicRateConstants_Determined`<br/>
 `RCC.IntrinsicRateConstants`<br/>
 
-### phi function
+#### phi function
 `RCC.phi_sr_snr_isc`<br/>
 `RCC.phi_tr_tnr_risc`<br/>
 
-### Internal Quantum Efficiency (IQE)
+#### Internal Quantum Efficiency (IQE)
 `RCC.IQE_PurcellEffect`<br/>
 `RCC.IQE_RateConstants`<br/>
 `RCC.IQE_Phi`<br/>
 `RCC.IQE_PLQY`<br/>
 
-### Differential Equations
+#### Differential Equations
 `RCC.PLQY_phi`<br/>
 `RCC.k_total`<br/>
 `RCC.kPF_kDF`<br/>
@@ -44,7 +46,7 @@ Besides, the module also provides the efficiency of TADF material and the excito
 `RCC.ConcentrationRatio_SteadyState`<br/>
 `RCC.PulseResponse`<br/>
 
-### script
+#### script
 `RCC.script_for_100_PLQY`<br/>
 `RCC.script`<br/>
 `RCC.pulseresponse_script`<br/>
