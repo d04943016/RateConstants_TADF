@@ -108,35 +108,35 @@ The panel would be like:
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Panel.png" width="400">
 </p>
 
-#### First
+### 1. First
 select lifetime or rate constant
 
-#### input measured parameters
+### 2. input measured parameters
 a) lifetimes (tau)/rate constants(k) of prompt fluorescence(PF) and delayed fluorescence (DF)<br/>
    Please notice the unit. <br/>
 b) quantum yield of prompt fluorescence(Phi PF) and delayed fluorescence (Phi DF)<br/>
 
-#### calculate
+### 3. calculate
 select save file path and name
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/CalculateData.png" width="400">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/CalculateData.png" width="800">
 </p>
 
-#### result
+### 4. result
 Two different cases (all loss from S1 and all loss from T1) are summarized on the terminals.
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Result.png" width="400">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Result.png" width="800">
 </p>
 
 The detailed data are in the save file path.
 a) txt
 b) rate constants v.s. loss from T1
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/DPAC-TRZ/DPAC-TRZ_rate_constants.png" width="400">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/DPAC-TRZ/DPAC-TRZ_rate_constants.png" width="800">
 </p>
 c) quantum yield v.s. loss from T1
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/DPAC-TRZ/DPAC-TRZ_quantum_yield.png" width="400">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/DPAC-TRZ/DPAC-TRZ_quantum_yield.png" width="800">
 </p>
 
 
