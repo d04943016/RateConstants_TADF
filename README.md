@@ -129,9 +129,9 @@ Two different cases (all loss from S1 and all loss from T1) are summarized on th
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Result.png" width="800">
 </p>
 
-The detailed data are in the save file path.
-a) txt
-b) rate constants v.s. loss from T1
+The detailed data are in the save file path.<br/>
+a) txt<br/>
+b) rate constants v.s. loss from T1<br/>
 <p align="center">
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/DPAC-TRZ/DPAC-TRZ_rate_constants.png" width="800">
 </p>
