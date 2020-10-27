@@ -1,7 +1,7 @@
 # RateConstants_TADF
-Intrinsic rate constants extraction for thermally activated delayed fluorescence (two delayed components)
+Intrinsic rate constants extraction for thermally activated delayed fluorescence (two delayed components)<br/>
 
-This module would use numpy and matplotlib, so please install these two modules first.
+This module would use numpy and matplotlib, so please install these two modules first.<br/>
 
     pip install numpy and matplotlib
 
@@ -11,9 +11,9 @@ Ref.<br/>
 [3] https://pubs.rsc.org/no/content/articlelanding/2015/cc/c5cc05022g/unauth#!divAbstract <br/>
 [4] https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201704961 <br/>
 
-This module provides functions to calculate the intrinsic rate constants between S0 (ground state), S1 (1st excited singlet), and T1 (1st excited triplet state), including S1->S0 (fluorescence and heat loss), S1->T1 (intersystem crossing), T1->S1 (reverse intersystem crossing), and T1->S0 (phosphorescence and heat loss).
+This module provides functions to calculate the intrinsic rate constants between S0 (ground state), S1 (1st excited singlet), and T1 (1st excited triplet state), including S1->S0 (fluorescence and heat loss), S1->T1 (intersystem crossing), T1->S1 (reverse intersystem crossing), and T1->S0 (phosphorescence and heat loss).<br/>
 
-Besides, the module also provides the efficiency of TADF material and the exciton concentration.
+Besides, the module also provides the efficiency of TADF material and the exciton concentration.<br/>
 
 ## RateConstantsCalculator Module
 
@@ -21,60 +21,60 @@ Besides, the module also provides the efficiency of TADF material and the excito
     
 #### Utilty function
 `RCC.tau2k(tau)`<br/>
-a function to calculate rate constant (k) from lifetime (tau).
+a function to calculate rate constant (k) from lifetime (tau).<br/>
 
 `RCC.k2tau(k)`<br/>
-a function to calculate lifetime from (tau) rate constant (k).
+a function to calculate lifetime from (tau) rate constant (k).<br/>
 
 `RCC.exponential_ratio(tau_Array, B_Array)`<br/>
-a function to calculate the relative ratio of each exponent
+a function to calculate the relative ratio of each exponent<br/>
 
 `RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)`<br/>
-a function to calculate the quantum efficiency contributed from prompt fluorescence and the delayed fluorescence
+a function to calculate the quantum efficiency contributed from prompt fluorescence and the delayed fluorescence<br/>
 
 #### intrinsic rate constant calculator
 `RCC.IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)`<br/>
 a function to calculate the intrinsice rate constants that can be determined by kPF (rate constant of prompt fluorescence), kDF (rate constant of delayed fluorescence), phi_PF (prompt fluorescence quantum yield) and phi_DF (delayed fluorescence quantum yield). <br/>
-These four values (kPF, kDF, phi_PF, phi_DF) can be directly extracted from the transient data 
+These four values (kPF, kDF, phi_PF, phi_DF) can be directly extracted from the transient data <br/>
 
     kPF=RCC.tau2k(tauPF)
     kDF=RCC.tau2k(tauDF) 
     
-and photoluminescence quantum yield (PLQY, phi_PF, phi_DF).
+and photoluminescence quantum yield (PLQY, phi_PF, phi_DF).<br/>
 
     [phi_PF, phi_DF] = RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)
     ksr, ks, kt, kisckrisc = RCC.IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)
     
-output : ksr (radiative rate constant from singlet state), ks (total rate constant from singlet state), kt (total rate constant from triplet state), kisckrisc (a product of the intersystem rate constant and the reverse intersystem crossing rate constant)
+output : ksr (radiative rate constant from singlet state), ks (total rate constant from singlet state), kt (total rate constant from triplet state), kisckrisc (a product of the intersystem rate constant and the reverse intersystem crossing rate constant)<br/>
 
 `RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)`<br/>
-a function to calculate the rate constants which cannot be calculated directly from the experimental data and should considering a the loss ratio from triplet state by PL excitation (phi_Tnr_PL)
+a function to calculate the rate constants which cannot be calculated directly from the experimental data and should considering a the loss ratio from triplet state by PL excitation (phi_Tnr_PL)<br/>
     
     ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc = RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)
 
 #### phi function
 `RCC.phi_sr_snr_isc(ksr, ksnr, kisc)`<br/>
-phi_sr_snr_isc is a function to calculate the efficiency of each process in S1
+phi_sr_snr_isc is a function to calculate the efficiency of each process in S1<br/>
 
 `RCC.phi_tr_tnr_risc(ktr, ktnr, krisc)`<br/>
-phi_tr_tnr_risc is a function to calculate the efficiency of each process in T1
+phi_tr_tnr_risc is a function to calculate the efficiency of each process in T1<br/>
 
 #### Internal Quantum Efficiency (IQE)
 `RCC.IQE_PurcellEffect(IQE, F=1.0)`<br/>
-a function to calculate the internal quantum yield considering Purcell effect. 
-IQE : internal quantum yield (PL excitation)
-F : Purcell factor
+a function to calculate the internal quantum yield considering Purcell effect. <br/>
+IQE : internal quantum yield (PL excitation)<br/>
+F : Purcell factor<br/>
 
 `RCC.IQE_RateConstants(ksr, kt, krisc, kPF, kDF, alpha=1.0, F=1.0)`<br/>
-a function to calculate the internal quantum yield considering Purcell effect. 
-alpha : singlet pumping ratio (PL : alpha = 1.0, EL : alpha = 0.25)
-F : Purcell factor
+a function to calculate the internal quantum yield considering Purcell effect. <br/>
+alpha : singlet pumping ratio (PL : alpha = 1.0, EL : alpha = 0.25)<br/>
+F : Purcell factor<br/>
 
 `RCC.IQE_Phi(phi_sr, phi_isc, phi_risc, alpha=1.0, F=1.0)`<br/>
-a function to calculate the internal quantum efficiency given with intrinsic state efficiency
+a function to calculate the internal quantum efficiency given with intrinsic state efficiency<br/>
 
 `RCC.IQE_PLQY(phi_risc, PLQY, alpha=1.0, F=1.0)`<br/>
- a function to calculate the internal quantum efficiency given with PLQY
+ a function to calculate the internal quantum efficiency given with PLQY<br/>
 
 #### Differential Equations
 `RCC.PLQY_phi(phi_sr, phi_isc, phi_risc)`<br/>
@@ -95,11 +95,11 @@ analyzer for PLQY not equal to 100%
 
 ## GUI 
 
-The graphic user interface is built by PyQt5, so please install PyQt5 first.
+The graphic user interface is built by PyQt5, so please install PyQt5 first.<br/>
 
     pip install PyQt5
     
-And the GUI can be executed as
+And the GUI can be executed as<br/>
 
     python GUI_PyQt5_main.py
 
@@ -109,7 +109,7 @@ The panel would be like:
 </p>
 
 ### 1. First
-select lifetime or rate constant
+select lifetime or rate constant<br/>
 
 ### 2. input measured parameters
 a) lifetimes (tau)/rate constants(k) of prompt fluorescence(PF) and delayed fluorescence (DF)<br/>
@@ -118,13 +118,13 @@ b) quantum yield of prompt fluorescence(Phi PF) and delayed fluorescence (Phi DF
    or prefactors of prompt fluorescence(PF) and delayed fluorescence (DF) and photoluminescence quantum yield (PLQY)
 
 ### 3. calculate
-select save file path and name
+select save file path and name<br/>
 <p align="center">
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/CalculateData.png" width="800">
 </p>
 
 ### 4. result
-Two different cases (all loss from S1 and all loss from T1) are summarized on the terminals.
+Two different cases (all loss from S1 and all loss from T1) are summarized on the terminals.<br/>
 <p align="center">
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Result.png" width="800">
 </p>
