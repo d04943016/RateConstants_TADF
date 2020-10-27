@@ -21,42 +21,42 @@ DF : delayed fluorescence<br/>
 tau: exciton lifetime<br/>
 k  : rate constant<br/>
 
-#### Measurables:<br/>
+#### Measurables:
 tauPF/tauDF: PF/DF exciton lifetime (extracted from transient data)<br/>
 kPF/kDF    : PF/DF rate constant (calculated from tauPF/tauDF)<br/>
 PLQY       : photoluminescence quantum yield (thin film)
-<br/>
-#### Intrinsic rate constants in S1<br/>
+
+#### Intrinsic rate constants in S1
 ks   : total rata constant in S1 (i.e. ks = ksr + ksnr + kisc)<br/>
 ksr  : radiative rate constant in S1<br/>
 ksnr : non-radiative rate constant in S1<br/>
 kisc : intersystem rate constant (S1->T1)<br/>
-<br/>
-#### Intrinsic rate constants in T1<br/>
+
+#### Intrinsic rate constants in T1
 kt   : total rata constant in T1 (i.e. kt = ktr + ktnr + krisc)<br/>
 ktr  : radiative rate constant in T1<br/>
 ktnr : non-radiative rate constant in T1<br/>
 krisc: reverse intersystem rate constant (T1->S1)<br/>
-<br/>
-#### Quantum yield (Q.Y.)<br/>
+
+#### Quantum yield (Q.Y.)
 phi_PF  : the component of PLQY contributed by PF (it should be noted that this value is in PL excitation and thin film situation)<br/>
 phi_DF  : the component of PLQY contributed by DF (it should be noted that this value is in PL excitation and thin film situation)<br/>
-<br/>
+
 phi_sr  : singlet radiative efficiency<br/>
 phi_snr : singlet non-radiative efficiency<br/>
 phi_isc : intersystem crossing efficiency<br/>
-<br/>
+
 phi_tr  : triplet radiative efficiency<br/>
 phi_tnr : triplet non-radiative efficiency<br/>
 phi_risc: reverse intersystem crossing efficiency<br/>
-<br/>
+
 phi_Tnr_PL : the total loss efficiency (i.e. 1-PLQY) from triplet state in PL excitation<br/>
 phi_Snr_PL : the total loss efficiency from singlet state in PL excitation ( phi_Snr_PL+phi_Tnr_PL = 1-PLQY )<br/>
-<br/>
-#### Prefactor : the coefficient of the exponent<br/>
+
+#### Prefactor : the coefficient of the exponent
 B_PF : the prefactor of PF<br/>
 B_DF : the prefactor of DF<br/>
-<br/>
+
 #### Purcell Effect
 F : Purcell factor <br/>
 IQE = ( PLQY*F/( (1-PLQY)+PLQY*F ) ) * ( alpha + phi_risc*(1-alpha) )<br/>
@@ -132,26 +132,26 @@ a function to calculate the PLQY from intrinsic state efficiency<br/>
 #### Differential Equations
 `RCC.k_total(kr, knr, kisc)`<br/>
 a function to calculate the total rate constant in a state.<br/> 
-<br/>
+
 `RCC.kPF_kDF(ksr, ksnr, kisc, ktr, ktnr, krisc, F=1.0)`<br/>
 a function to calculate kPF and kDF from intrinsic rate constant considering Purcell Effect.<br/>
 output : kPF, kDF<br/>
-<br/>
+
 `RCC.Concentration_SteadyState(ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, F=1.0)`<br/>
 a function to calculate the steady state S1 and T1 exciton concentration.<br/>
 G : total exciton generation rate (i.e. S1+T1)<br/>
 output : ratio
-<br/>
+
 `RCC.ConcentrationRatio_SteadyState(ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, F=1.0)`<br/>
 a function to calculate the steady state concentration ratio between T1 and S1 (T1/S1).<br/>
 output : S1_SS, T1_SS<br/>
-<br/>
+
 `RCC.PulseResponse(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, F=1.0)`<br/>
 a function to calculte the time evolution of S1 and T1 concentration.<br/>
 output : S1_t, T1_t, caches<br/>
 caches = (ks, kt, ks, kt, S10, T10, V_PF, V_DF)<br/>
 V_PF and V_DF are the characteristic vector for PF and DF, respectively.<br/>
-<br/>
+
 #### script
 `RCC.script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name='')`<br/>
 analyzer for PLQY=100%<br/>
