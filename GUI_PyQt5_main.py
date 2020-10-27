@@ -17,7 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle('PLQY calculator')
+        self.setWindowTitle('Rate constant calculator')
 
         # Load Button
         self.ui.comboBox_LF_k.activated.connect(self.comboBox_LF_k_activated)

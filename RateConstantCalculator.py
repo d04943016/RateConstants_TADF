@@ -122,11 +122,11 @@ def IQE_PLQY(phi_risc, PLQY, alpha=1.0, F=1.0):
     #   given with PLQY.
     IQE = ( alpha + (1-alpha)*phi_risc ) * PLQY
     return IQE_PurcellEffect(IQE, F=F)
+def PLQY_phi(phi_sr, phi_isc, phi_risc):
+    return phi_sr/( 1-phi_isc*phi_risc )
 ##############################################################################
 # Differential Equations
 ##############################################################################
-def PLQY_phi(phi_sr, phi_isc, phi_risc):
-    return phi_sr/( 1-phi_isc*phi_risc )
 def k_total(kr, knr, kisc):
     # k_total is a function to calculate the total rate constant
     return kr+knr+kisc
@@ -223,11 +223,13 @@ def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, k
     plt.plot(phi_Tnr_PL_Array*100, kt_Array   , linewidth=2)
     plt.plot(phi_Tnr_PL_Array*100, krisc_Array, linewidth=2)
     plt.yscale('log')
-    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$')
-    plt.ylabel(r'rate constants [1/s]')
-    plt.title(fname)
+    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$', fontsize=20)
+    plt.ylabel(r'rate constants [1/s]', fontsize=20)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.title(fname, fontsize=20)
     ax.grid(True)
-    plt.legend([r'$k_s$', r'$k_{sr}$', r'$k_{snr}$', r'$k_{isc}$', r'$k_t$', r'$k_{risc}$'])
+    plt.legend([r'$k_s$', r'$k_{sr}$', r'$k_{snr}$', r'$k_{isc}$', r'$k_t$', r'$k_{risc}$'], fontsize=15)
     ax.set_ylim(1e4,1e8)
     fig.tight_layout()
     fig.savefig(  os.path.join(fpath,fname + '_rate_constants') )
@@ -243,11 +245,13 @@ def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, k
     plt.plot(phi_Tnr_PL_Array*100, phi_tr_Array*100   , linewidth=2)
     plt.plot(phi_Tnr_PL_Array*100, phi_tnr_Array*100  , linewidth=2)
     plt.plot(phi_Tnr_PL_Array*100, phi_risc_Array*100 , linewidth=2)
-    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$')
-    plt.ylabel(r'Q.Y. [\%]')
-    plt.title(fname)
+    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$', fontsize=20)
+    plt.ylabel(r'Q.Y. [\%]', fontsize=20)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.title(fname, fontsize=20)
     ax.grid(True)
-    plt.legend([r'$\Phi_{sr}$', r'$\Phi_{snr}$', r'$\Phi_{isc}$', r'$\Phi_{tr}$', r'$\Phi_{tnr}$', r'$\Phi_{risc}$'])
+    plt.legend([r'$\Phi_{sr}$', r'$\Phi_{snr}$', r'$\Phi_{isc}$', r'$\Phi_{tr}$', r'$\Phi_{tnr}$', r'$\Phi_{risc}$'], fontsize=15)
     fig.tight_layout()
     fig.savefig(  os.path.join(fpath,fname + '_quantum_yield') )
     plt.close(fig)
