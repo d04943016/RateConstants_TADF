@@ -93,5 +93,29 @@ analyzer for PLQY not equal to 100%
 
 `RCC.pulseresponse_script(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, name='')`<br/>
 
+## GUI 
+
+The graphic user interface is built by PyQt5, so please install PyQt5 first.
+
+    pip install PyQt5
+    
+And the GUI can be executed as
+
+    python GUI_PyQt5_main.py
+
+The panel would be like:
+<p align="center">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Panel.png" width="400">
+</p>
+
+
+
+
+
+
+
+
+
+
 
 
