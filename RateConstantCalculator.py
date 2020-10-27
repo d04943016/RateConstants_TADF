@@ -3,7 +3,7 @@
 
 # coding=utf-8
 # -*- coding: utf8 -*-
-
+import os
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -201,7 +201,56 @@ def script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
     print('  phi_sr = {0:>6.2f}, phi_snr = {1:>6.2f}, phi_isc = {2:>6.2f}'.format(phi_sr_Array[0]*100, phi_snr_Array[0]*100, phi_isc_Array[0]*100) )
     print('  phi_tr = {0:>6.2f}, phi_tnr = {1:>6.2f}, phi_risc= {2:>6.2f}'.format(phi_tr_Array[0]*100, phi_tnr_Array[0]*100, phi_risc_Array[0]*100) )
     print('')
-def script(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
+def save_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, kisc_Array, kt_Array, ktr_Array, ktnr_Array, krisc_Array, phi_sr_Array, phi_snr_Array, phi_isc_Array, phi_tr_Array, phi_tnr_Array, phi_risc_Array):
+    # write
+    if not os.path.isdir(fpath):
+        os.makedirs(fpath)
+    with open( os.path.join(fpath, fname+'.txt'), 'w') as file:
+        file.write('{0:>15s} {1:>15s} {2:>15s} {3:>15s} {4:>15s} {5:>15s} {6:>15s} {7:>15s} {8:>15s} {9:>15s} {10:>15s} {11:>15s} {12:>15s} {13:>15s}\n'.format('ks(1/s)', 'ksr(1/s)', 'ksnr(1/s)', 'kisc(1/s)', 'kt(1/s)', 'ktr(1/s)', 'ktnr(1/s)', 'krisc(1/s)', 'phi_sr(%)', 'phi_snr(%)', 'phi_isc(%)', 'phi_tr(%)', 'phi_tnr(%)', 'phi_risc(%)') )
+        for ii in range( len(phi_Tnr_PL_Array) ):
+            file.write('{0:>15.5e} {1:>15.5e} {2:>15.5e} {3:>15.5e} {4:>15.5e} {5:>15.5e} {6:>15.5e} {7:>15.5e} {8:>15.5f} {9:>15.5f} {10:>15.5f} {11:>15.5f} {12:>15.5f} {13:>15.5f}\n'.format(ks_Array[ii], ksr_Array[ii], ksnr_Array[ii], kisc_Array[ii], kt_Array[ii], ktr_Array[ii], ktnr_Array[ii], krisc_Array[ii], phi_sr_Array[ii]*100, phi_snr_Array[ii]*100, phi_isc_Array[ii]*100, phi_tr_Array[ii]*100, phi_tnr_Array[ii]*100, phi_risc_Array[ii]*100) )
+def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, kisc_Array, kt_Array, ktr_Array, ktnr_Array, krisc_Array, phi_sr_Array, phi_snr_Array, phi_isc_Array, phi_tr_Array, phi_tnr_Array, phi_risc_Array):
+    if not os.path.isdir(fpath):
+        os.makedirs(fpath)
+
+    # rate constants    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.plot(phi_Tnr_PL_Array*100, ks_Array   , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, ksr_Array  , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, ksnr_Array , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, kisc_Array , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, kt_Array   , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, krisc_Array, linewidth=2)
+    plt.yscale('log')
+    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$')
+    plt.ylabel(r'rate constants [1/s]')
+    plt.title(fname)
+    ax.grid(True)
+    plt.legend([r'$k_s$', r'$k_sr$', r'$k_snr$', r'$k_isc$', r'$k_t$', r'$k_risc$'])
+    fig.tight_layout()
+    fig.savefig(  os.path.join(fpath,fname + '_rate_constants') )
+    plt.close(fig)
+
+    # qauntum yield
+    # rate constants    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.plot(phi_Tnr_PL_Array*100, phi_sr_Array*100   , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, phi_snr_Array*100  , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, phi_isc_Array*100  , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, phi_tr_Array*100   , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, phi_tnr_Array*100  , linewidth=2)
+    plt.plot(phi_Tnr_PL_Array*100, phi_risc_Array*100 , linewidth=2)
+    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$')
+    plt.ylabel(r'Q.Y. [\%]')
+    plt.title(fname)
+    ax.grid(True)
+    plt.legend([r'$\Phi_{sr}$', r'$\Phi_{snr}$', r'$\Phi_{isc}$', r'$\Phi_{tr}$', r'$\Phi_{tnr}$', r'$\Phi_{risc}$'])
+    fig.tight_layout()
+    fig.savefig(  os.path.join(fpath,fname + '_quantum_yield') )
+    plt.close(fig)
+def script(tau_PF, tau_DF, phi_PF, phi_DF, fpath='', fname=''):
     PLQY = phi_PF+phi_DF
 
     kPF, kDF = tau2k([tau_PF, tau_DF])
@@ -212,7 +261,7 @@ def script(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
     phi_sr_Array, phi_snr_Array, phi_isc_Array = phi_sr_snr_isc(ksr_Array, ksnr_Array, kisc_Array)
     phi_tr_Array, phi_tnr_Array, phi_risc_Array= phi_tr_tnr_risc(ktr_Array, ktnr_Array, krisc_Array)
 
-    print('=============================== {0} ==============================='.format(name) )
+    print('=============================== {0} ==============================='.format(fname) )
     print('* Rate Constants [1/s] :')
     print('  kPF= {0:>5.2e}, kDF = {1:>5.2e}'.format(kPF, kDF))
     for idx in [0,-1]:
@@ -227,26 +276,19 @@ def script(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
         print('  phi_tr = {0:>6.2f}, phi_tnr = {1:>6.2f}, phi_risc= {2:>6.2f}'.format(phi_tr_Array[idx]*100, phi_tnr_Array[idx]*100, phi_risc_Array[idx]*100) )
     print('')
 
-
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    plt.plot(phi_Tnr_PL_Array*100, ks_Array   , linewidth=2)
-    plt.plot(phi_Tnr_PL_Array*100, ksr_Array  , linewidth=2)
-    plt.plot(phi_Tnr_PL_Array*100, ksnr_Array , linewidth=2)
-    plt.plot(phi_Tnr_PL_Array*100, kisc_Array , linewidth=2)
-    plt.plot(phi_Tnr_PL_Array*100, kt_Array   , linewidth=2)
-    plt.plot(phi_Tnr_PL_Array*100, krisc_Array, linewidth=2)
-
-    plt.yscale('log')
-    plt.xlabel(r'$\Phi_{Tnr}^{PL} [\%]$')
-    plt.ylabel(r'rate constants [1/s]')
-    plt.title(name)
-    ax.grid(True)
-
-    plt.legend([r'$k_s$', r'$k_sr$', r'$k_snr$', r'$k_isc$', r'$k_t$', r'$k_risc$'])
-    plt.show()
+    # save data 
+    if (fpath!='') and (fname!=''):
+        save_data(fpath, fname, phi_Tnr_PL_Array, 
+                  ks_Array, ksr_Array, ksnr_Array, kisc_Array, 
+                  kt_Array, ktr_Array, ktnr_Array, krisc_Array, 
+                  phi_sr_Array, phi_snr_Array, phi_isc_Array, 
+                  phi_tr_Array, phi_tnr_Array, phi_risc_Array)
+        
+        plot_data(fpath, fname, phi_Tnr_PL_Array,
+                  ks_Array, ksr_Array, ksnr_Array, kisc_Array, 
+                  kt_Array, ktr_Array, ktnr_Array, krisc_Array, 
+                  phi_sr_Array, phi_snr_Array, phi_isc_Array, 
+                  phi_tr_Array, phi_tnr_Array, phi_risc_Array)
 def pulseresponse_script(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, name=''):
     S1_t, T1_t, caches = PulseResponse(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=alpha, G=G)
 
@@ -271,10 +313,10 @@ if __name__ == '__main__':
     script_for_100_PLQY(tau_PF=17e-9, tau_DF=2.1e-6, phi_PF=0.79, phi_DF=0.21, name='SpiroAC-TRZ')
 
     # DPAC-TRZ
-    script(tau_PF=15e-9, tau_DF=2.9e-6, phi_PF=0.70, phi_DF=0.12, name='DPAC-TRZ')
+    script(tau_PF=15e-9, tau_DF=2.9e-6, phi_PF=0.70, phi_DF=0.12, fname='DPAC-TRZ', fpath='./data')
 
     # DMAC-TRZ
-    script(tau_PF=20e-9, tau_DF=1.9e-6, phi_PF=0.59, phi_DF=0.31, name='DMAC-TRZ')
+    script(tau_PF=20e-9, tau_DF=1.9e-6, phi_PF=0.59, phi_DF=0.31, fname='DMAC-TRZ', fpath='./data')
 
     # case : calculate pulse response
 
