@@ -115,6 +115,7 @@ select lifetime or rate constant
 a) lifetimes (tau)/rate constants(k) of prompt fluorescence(PF) and delayed fluorescence (DF)<br/>
    Please notice the unit. <br/>
 b) quantum yield of prompt fluorescence(Phi PF) and delayed fluorescence (Phi DF)<br/>
+   or prefactors of prompt fluorescence(PF) and delayed fluorescence (DF) and photoluminescence quantum yield (PLQY)
 
 ### 3. calculate
 select save file path and name
