@@ -105,7 +105,7 @@ And the GUI can be executed as
 
 The panel would be like:
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Panel.png" width="400">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Panel.png" width="1200">
 </p>
 
 ### 1. First
