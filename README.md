@@ -63,7 +63,7 @@ B_DF : the prefactor of DF<br/>
 
 #### Purcell Effect
 F : Purcell factor <br/>
-IQE = ( PLQYXF/( (1-PLQY)+PLQYXF ) ) * ( alpha + phi_riscX(1-alpha) )<br/>
+IQE = ( PLQY * F/( (1-PLQY)+PLQY * F ) ) * ( alpha + phi_risc * (1-alpha) )<br/>
 alpha is the pumping ratio from the ground state to S1.<br/>
 alpha = 1.00 for PL excitation<br/>
 alpha = 0.25 for EL excitation<br/>
