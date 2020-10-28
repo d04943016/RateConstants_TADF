@@ -14,7 +14,7 @@ Ref.<br/>
 This module provides functions to calculate the intrinsic rate constants between S0 (ground state), S1 (1st excited singlet), and T1 (1st excited triplet state), including S1->S0 (fluorescence and heat loss), S1->T1 (intersystem crossing), T1->S1 (reverse intersystem crossing), and T1->S0 (phosphorescence and heat loss).<br/>
 
 <p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/process.png" width="1200">
+<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/process.png" width="600">
 </p>
 
 Besides, the module also provides the efficiency of TADF material and the exciton concentration.<br/>
