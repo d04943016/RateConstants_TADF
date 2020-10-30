@@ -177,7 +177,7 @@ class MainWindow(QtWidgets.QMainWindow):
             print('')
         
         # save file path
-        initialdir, extension = QtWidgets.QFileDialog.getSaveFileName(self, "Save file", os.getcwd(), "All Files (*);;Text Files (*.txt)" )
+        initialdir, extension = QtWidgets.QFileDialog.getSaveFileName(self, "Save file", os.getcwd(), "All Files (*)" )
         fpath = os.path.dirname(initialdir)
         fname = initialdir[(len(fpath)+1)::]
         if len(fname)==0 or len(fpath)==0:
