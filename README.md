@@ -3,7 +3,7 @@ Intrinsic rate constants extraction for thermally activated delayed fluorescence
 
 This module would use numpy and matplotlib, so please install these two modules first.<br/>
 
-    pip install numpy and matplotlib
+    pip install numpy matplotlib
 
 Ref.<br/>
 [1] https://onlinelibrary.wiley.com/doi/abs/10.1002/adfm.201602501 <br/>
