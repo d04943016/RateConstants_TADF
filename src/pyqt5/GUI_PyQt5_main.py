@@ -8,7 +8,7 @@ import numpy as np
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from GUI_intrinsic_rate_constants_PyQt5 import Ui_MainWindow
-import RateConstantCalculator as RCC 
+import rate_constants_calculator as rcc 
 
 import sys
 
@@ -52,6 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.B_PF = 1.0
         self.B_DF = 1.0
         self.PLQY = 1.0
+    
     # help functions
     def IsInteger(self,strr):
         try:
@@ -61,12 +62,14 @@ class MainWindow(QtWidgets.QMainWindow):
             return True
         except:
             return False
+    
     def IsFloat(self,strr):
         try:
             datasize = float(strr)
             return True
         except:
             return False
+    
     # clicked function
     def comboBox_LF_k_activated(self):
         Index = self.ui.comboBox_LF_k.currentIndex()
@@ -82,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.ui.textEdit_PF.setPlainText( str( round(self.kPF/1e8, 5) ) )
             self.ui.textEdit_DF.setPlainText( str( round(self.kDF/1e5, 5) ) )
+    
     def comboBox_QY_B_activated(self):
         Index = self.ui.comboBox_QY_B.currentIndex()
         if Index == 0: # Q.Y.
@@ -104,6 +108,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.label_PLQY.show()
             self.ui.textEdit_PLQY.show()
             self.ui.label_PLQY_unit.show()
+   
     def textEdit_PF_textChanged(self):
         string = self.ui.textEdit_PF.toPlainText()
         if not self.IsFloat(string):
@@ -115,6 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tauPF = value*1e-9
         else: # rate constant
             self.kPF = value*1e8
+    
     def textEdit_DF_textChanged(self):
         string = self.ui.textEdit_DF.toPlainText()
         if not self.IsFloat(string):
@@ -126,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tauDF = value*1e-6
         else: # rate constant
             self.kDF = value*1e5
+    
     def textEdit_Phi_PF_textChanged(self):
         string = self.ui.textEdit_Phi_PF.toPlainText()
         if not self.IsFloat(string):
@@ -136,6 +143,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.Phi_PF = float(string) * 0.01
         else: # B
            self.B_PF = float(string)
+    
     def textEdit_Phi_DF_textChanged(self):
         string = self.ui.textEdit_Phi_DF.toPlainText()
         if not self.IsFloat(string):
@@ -146,12 +154,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.Phi_DF = float(string) * 0.01  
         else: # B
            self.B_DF = float(string)  
+    
     def textEdit_PLQY_textChanged(self):
         string = self.ui.textEdit_PLQY.toPlainText()
         if not self.IsFloat(string):
             print('PLQY should be a positive value.')
             return 
         self.PLQY = float(string) * 0.01
+    
     def pushButton_calculate_clicked(self):
         # print Information
         Index1 = self.ui.comboBox_LF_k.currentIndex()
@@ -187,13 +197,13 @@ class MainWindow(QtWidgets.QMainWindow):
         if Index1 == 0: # lifetime
             tau_PF, tau_DF = self.tauPF, self.tauDF
         else:
-            tau_PF, tau_DF = RCC.k2tau([self.kPF, self.kDF])
+            tau_PF, tau_DF = rcc.k2tau([self.kPF, self.kDF])
         if Index2 == 0: # Q.Y.
             Phi_PF, Phi_DF = self.Phi_PF, self.Phi_DF
         else:
-            Phi_PF, Phi_DF = RCC.phi_PF_DF(self.PLQY, tau_PF, tau_DF, self.B_PF, self.B_DF)
+            Phi_PF, Phi_DF = rcc.cal_phi_PF_DF(self.PLQY, tau_PF, tau_DF, self.B_PF, self.B_DF)
 
-        RCC.script(tau_PF, tau_DF, Phi_PF, Phi_DF, fpath=fpath, fname=fname)
+        rcc.script(tau_PF, tau_DF, Phi_PF, Phi_DF, fpath=fpath, fname=fname)
 
 if __name__ == '__main__':
      app = QtWidgets.QApplication([])
