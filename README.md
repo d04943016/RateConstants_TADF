@@ -1,90 +1,100 @@
 # RateConstants_TADF
-Intrinsic rate constants extraction for thermally activated delayed fluorescence (two delayed components)<br/>
 
-This module would use numpy and matplotlib, so please install these two modules first.<br/>
+A module for extracting intrinsic rate constants in thermally activated delayed fluorescence (TADF) materials with two delayed components.
 
-    pip install numpy and matplotlib
+Prerequisites:
+```
+pip install numpy matplotlib
+```
 
-Ref.<br/>
-[1] https://onlinelibrary.wiley.com/doi/abs/10.1002/adfm.201602501 <br/>
-[2] https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201601675 <br/>
-[3] https://pubs.rsc.org/no/content/articlelanding/2015/cc/c5cc05022g/unauth#!divAbstract <br/>
-[4] https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201704961 <br/>
+References:<br/>
+[1] [Efficient and Tunable Thermally Activated Delayed Fluorescence Emitters Having Orientation-Adjustable CN-Substituted Pyridine and Pyrimidine Acceptor Units
+](https://onlinelibrary.wiley.com/doi/abs/10.1002/adfm.201602501)<br/>
+[2] [Sky-Blue Organic Light Emitting Diode with 37% External Quantum Efficiency Using Thermally Activated Delayed Fluorescence from Spiroacridine-Triazine Hybrid
+](https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201601675)<br/>
+[3] [A versatile thermally activated delayed fluorescence emitter for both highly efficient doped and non-doped organic light emitting devices](https://pubs.rsc.org/no/content/articlelanding/2015/cc/c5cc05022g/unauth#!divAbstract)<br/>
+[4] [Achieving Nearly 30% External Quantum Efficiency for Orange–Red Organic Light Emitting Diodes by Employing Thermally Activated Delayed Fluorescence Emitters Composed of 1,8-Naphthalimide-Acridine Hybrids
+](https://onlinelibrary.wiley.com/doi/abs/10.1002/adma.201704961)<br/>
 
-This module provides functions to calculate the intrinsic rate constants between S0 (ground state), S1 (1st excited singlet), and T1 (1st excited triplet state), including S1->S0 (fluorescence and heat loss), S1->T1 (intersystem crossing), T1->S1 (reverse intersystem crossing), and T1->S0 (phosphorescence and heat loss).<br/>
+This module calculates intrinsic rate constants between energy states:
+- S0 (ground state)
+- S1 (1st excited singlet)
+- T1 (1st excited triplet state)
+
+Including transitions:
+- S1→S0 (fluorescence and heat loss)
+- S1→T1 (intersystem crossing)
+- T1→S1 (reverse intersystem crossing)
+- T1→S0 (phosphorescence and heat loss)
 
 <p align="center">
-<img src="./image/process.png" width="600">
+<img src="./docs/Graph/process.png" width="600">
 </p>
 
-
-Besides, the module also provides the efficiency of TADF material and the exciton concentration.<br/>
+The module also provides TADF material efficiency and exciton concentration calculations.
 
 ## Symbols
-PF : prompt fluorescence<br/>
-DF : delayed fluorescence<br/>
-tau: exciton lifetime<br/>
-k  : rate constant<br/>
+- PF: Prompt fluorescence
+- DF: Delayed fluorescence
+- tau: Exciton lifetime
+- k: Rate constant
 
 #### Measurables:
-tauPF/tauDF: PF/DF exciton lifetime (extracted from transient data)<br/>
-kPF/kDF    : PF/DF rate constant (calculated from tauPF/tauDF)<br/>
-PLQY       : photoluminescence quantum yield (thin film)
+- tauPF/tauDF: PF/DF exciton lifetime from transient data
+- kPF/kDF: PF/DF rate constant (calculated from tauPF/tauDF)
+- PLQY: Photoluminescence quantum yield (thin film)
 
 #### Intrinsic rate constants in S1
-ks   : total rata constant in S1 (i.e. ks = ksr + ksnr + kisc)<br/>
-ksr  : radiative rate constant in S1<br/>
-ksnr : non-radiative rate constant in S1<br/>
-kisc : intersystem rate constant (S1->T1)<br/>
+- ks: Total rate constant in S1 (ks = ksr + ksnr + kisc)
+- ksr: Radiative rate constant in S1
+- ksnr: Non-radiative rate constant in S1
+- kisc: Intersystem rate constant (S1→T1)
 
 #### Intrinsic rate constants in T1
-kt   : total rata constant in T1 (i.e. kt = ktr + ktnr + krisc)<br/>
-ktr  : radiative rate constant in T1<br/>
-ktnr : non-radiative rate constant in T1<br/>
-krisc: reverse intersystem rate constant (T1->S1)<br/>
+- kt: Total rate constant in T1 (kt = ktr + ktnr + krisc)
+- ktr: Radiative rate constant in T1
+- ktnr: Non-radiative rate constant in T1
+- krisc: Reverse intersystem rate constant (T1→S1)
 
 #### Quantum yield (Q.Y.)
-phi_PF  : the component of PLQY contributed by PF (it should be noted that this value is in PL excitation and thin film situation)<br/>
-phi_DF  : the component of PLQY contributed by DF (it should be noted that this value is in PL excitation and thin film situation)<br/>
+- phi_PF: PLQY component from PF (PL excitation, thin film)
+- phi_DF: PLQY component from DF (PL excitation, thin film)
 
-phi_sr  : singlet radiative efficiency<br/>
-phi_snr : singlet non-radiative efficiency<br/>
-phi_isc : intersystem crossing efficiency<br/>
+- phi_sr: Singlet radiative efficiency
+- phi_snr: Singlet non-radiative efficiency
+- phi_isc: Intersystem crossing efficiency
 
-phi_tr  : triplet radiative efficiency<br/>
-phi_tnr : triplet non-radiative efficiency<br/>
-phi_risc: reverse intersystem crossing efficiency<br/>
+- phi_tr: Triplet radiative efficiency
+- phi_tnr: Triplet non-radiative efficiency
+- phi_risc: Reverse intersystem crossing efficiency
 
-phi_Tnr_PL : the total loss efficiency (i.e. 1-PLQY) from triplet state in PL excitation<br/>
-phi_Snr_PL : the total loss efficiency from singlet state in PL excitation ( phi_Snr_PL+phi_Tnr_PL = 1-PLQY )<br/>
+- phi_Tnr_PL: Total loss efficiency from triplet state in PL excitation
+- phi_Snr_PL: Total loss efficiency from singlet state in PL excitation
 
-#### Prefactor : the coefficient of the exponent
-B_PF : the prefactor of PF<br/>
-B_DF : the prefactor of DF<br/>
+#### Prefactor
+- B_PF: Prefactor of PF
+- B_DF: Prefactor of DF
 
 #### Purcell Effect
-F : Purcell factor <br/>
-IQE = ( PLQY * F/( (1-PLQY)+PLQY * F ) ) * ( alpha + phi_risc * (1-alpha) )<br/>
-alpha is the pumping ratio from the ground state to S1.<br/>
-alpha = 1.00 for PL excitation<br/>
-alpha = 0.25 for EL excitation<br/>
+F: Purcell factor
+IQE = (PLQY * F/((1-PLQY)+PLQY * F)) * (alpha + phi_risc * (1-alpha))
+where:
+- alpha = 1.00 for PL excitation
+- alpha = 0.25 for EL excitation
 
 ## RateConstantsCalculator Module
 
-    import RateConstantsCalculator as RCC
+```python
+import RateConstantsCalculator as RCC
+```
 
-#### Utilty function
-`RCC.tau2k(tau)`<br/>
-a function to calculate rate constant (k) from lifetime (tau).<br/>
-
-`RCC.k2tau(k)`<br/>
-a function to calculate lifetime from (tau) rate constant (k).<br/>
-
-`RCC.exponential_ratio(tau_Array, B_Array)`<br/>
-a function to calculate the relative ratio of each exponent<br/>
-
-`RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)`<br/>
-a function to calculate the quantum efficiency contributed from prompt fluorescence and the delayed fluorescence<br/>
+#### Utility Functions
+```python
+RCC.tau2k(tau)          # Calculate rate constant from lifetime
+RCC.k2tau(k)           # Calculate lifetime from rate constant
+RCC.exponential_ratio(tau_Array, B_Array)  # Calculate relative ratio of each exponent
+RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)  # Calculate quantum efficiency from PF and DF
+```
 
 #### intrinsic rate constant calculator
 `RCC.IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)`<br/>
@@ -204,7 +214,7 @@ And the GUI can be executed as<br/>
 
 The panel would be like:
 <p align="center">
-<img src="./image/Panel.png" width="1200">
+<img src="./docs/Graph/Panel.png" width="1200">
 </p>
 
 
@@ -220,14 +230,14 @@ b) quantum yield of prompt fluorescence(Phi PF) and delayed fluorescence (Phi DF
 ### 3. calculate
 select save file path and name<br/>
 <p align="center">
-<img src="./image/CalculateData.png" width="800">
+<img src="./docs/Graph/CalculateData.png" width="800">
 </p>
 
 
 ### 4. result
 Two different cases (all loss from S1 and all loss from T1) are summarized on the terminal.<br/>
 <p align="center">
-<img src="./image/Result.png" width="800">
+<img src="./docs/Graph/Result.png" width="800">
 </p>
 
 The detailed data are in the save file path.<br/>
@@ -235,7 +245,7 @@ a) txt<br/>
 b) rate constants v.s. loss from T1<br/>
 
 <p align="center">
-<img src="./image/DPAC-TRZ_rate_constants.png" width="800">
+<img src="./examples/DPAC-TRZ/DPAC-TRZ_rate_constants.png" width="800">
 </p>
 
 c) quantum yield v.s. loss from T1
