@@ -251,10 +251,11 @@ python GUI_PyQt5_main.py
 ```
 RateConstants_TADF/
 ├── src/                   # Source code
-│   ├── pyqt5/             # PyQt5 GUI
-|   ├── html/              # html GUI
 │   ├── rate_constants_calculator.py # analytical solutions
 │   └── numerical_rate_equation.py   # numerical differential rate equations
+├── gui/                   # graphic user interface
+│   ├── pyqt5/             # PyQt5 GUI
+|   └── html/              # html GUI
 ├── image/                # Documentation and images
 ├── data/                 # Example data and results
 └── README.md             # documentation

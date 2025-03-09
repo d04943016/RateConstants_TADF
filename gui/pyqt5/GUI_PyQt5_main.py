@@ -8,9 +8,15 @@ import numpy as np
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from GUI_intrinsic_rate_constants_PyQt5 import Ui_MainWindow
-import rate_constants_calculator as rcc 
 
-import sys
+
+### my module
+guipath = os.path.dirname(os.path.abspath(__file__))
+basepath = os.path.dirname(guipath)
+if basepath not in sys.path:
+    sys.path.append(basepath)
+from src import rate_constants_calculator as rcc 
+
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):

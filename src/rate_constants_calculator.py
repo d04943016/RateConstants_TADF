@@ -474,15 +474,31 @@ def cal_pulse_response(t:np.ndarray, ksr:float, ksnr:float, kisc:float, ktr:floa
     return S1_t, T1_t, caches
 
 """ script """
-def script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
+def script_for_100_PLQY(tau_PF:float, tau_DF:float, phi_PF:float, phi_DF:float, name:str='')->dict[str, float]:
+    """
+    a script for calculating the rate constants and quantum yields for 100% PLQY.
+
+    Args:
+        tau_PF: radiative lifetime of prompt fluorescence
+        tau_DF: radiative lifetime of delayed fluorescence
+        phi_PF: quantum yield of prompt fluorescence
+        phi_DF: quantum yield of delayed fluorescence
+        name: name of the material
+
+    """
+
+    # calculate the rate constants
     kPF, kDF = tau2k([tau_PF, tau_DF])
-    # phi_Tnr_PL_Array = np.linspace(0, 1-PLQY, int(200) )
+    
+    # calculate the rate constants
     ks_Array, ksr_Array, ksnr_Array, kisc_Array, kt_Array, ktr_Array, ktnr_Array, krisc_Array \
          = cal_intrinsic_rate_constants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL=0)
-
+    
+    # calculate the process efficiency
     phi_sr_Array, phi_snr_Array, phi_isc_Array = cal_phi_sr_snr_isc(ksr_Array, ksnr_Array, kisc_Array)
     phi_tr_Array, phi_tnr_Array, phi_risc_Array= cal_phi_tr_tnr_risc(ktr_Array, ktnr_Array, krisc_Array)
 
+    # print the results
     print('=============================== {0} ==============================='.format(name) )
     print('* Rate Constants [1/s] :')
     print('  kPF= {0:>5.2e}, kDF = {1:>5.2e}'.format(kPF, kDF))
@@ -493,18 +509,103 @@ def script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name=''):
     print('  phi_tr = {0:>6.2f}, phi_tnr = {1:>6.2f}, phi_risc= {2:>6.2f}'.format(phi_tr_Array[0]*100, phi_tnr_Array[0]*100, phi_risc_Array[0]*100) )
     print('')
 
-def save_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, kisc_Array, kt_Array, ktr_Array, ktnr_Array, krisc_Array, phi_sr_Array, phi_snr_Array, phi_isc_Array, phi_tr_Array, phi_tnr_Array, phi_risc_Array):
+    result = {'kPF':kPF, 
+              'kDF':kDF, 
+              'ks':ks_Array[0], 
+              'ksr':ksr_Array[0],
+              'ksnr':ksnr_Array[0],
+              'kisc':kisc_Array[0],
+              'kt':kt_Array[0],
+              'ktr':ktr_Array[0],
+              'ktnr':ktnr_Array[0],
+              'krisc':krisc_Array[0],
+              'phi_sr':phi_sr_Array[0],
+              'phi_snr':phi_snr_Array[0],
+              'phi_isc':phi_isc_Array[0],
+              'phi_tr':phi_tr_Array[0],
+              'phi_tnr':phi_tnr_Array[0],
+              'phi_risc':phi_risc_Array[0]
+              }
+    return result
+
+def save_data(fpath:str, 
+              fname:str, 
+              phi_Tnr_PL_Array:np.ndarray, 
+              ks_Array:np.ndarray, 
+              ksr_Array:np.ndarray, 
+              ksnr_Array:np.ndarray, 
+              kisc_Array:np.ndarray, 
+              kt_Array:np.ndarray, 
+              ktr_Array:np.ndarray, 
+              ktnr_Array:np.ndarray, 
+              krisc_Array:np.ndarray,
+              phi_sr_Array:np.ndarray, 
+              phi_snr_Array:np.ndarray, 
+              phi_isc_Array:np.ndarray, 
+              phi_tr_Array:np.ndarray, 
+              phi_tnr_Array:np.ndarray, 
+              phi_risc_Array:np.ndarray,
+    ):
+    """
+    save the data to a file.
+
+    Args:
+        fpath: path to save the file
+        fname: name of the file
+        phi_Tnr_PL_Array: array of PLQY
+        ks_Array: array of rate constants
+
+    """
     # write
-    if not os.path.isdir(fpath):
-        os.makedirs(fpath)
+    os.makedirs(fpath, exist_ok=True)
     with open( os.path.join(fpath, fname+'.txt'), 'w') as file:
         file.write('{0:>15s} {1:>15s} {2:>15s} {3:>15s} {4:>15s} {5:>15s} {6:>15s} {7:>15s} {8:>15s} {9:>15s} {10:>15s} {11:>15s} {12:>15s} {13:>15s}\n'.format('ks(1/s)', 'ksr(1/s)', 'ksnr(1/s)', 'kisc(1/s)', 'kt(1/s)', 'ktr(1/s)', 'ktnr(1/s)', 'krisc(1/s)', 'phi_sr(%)', 'phi_snr(%)', 'phi_isc(%)', 'phi_tr(%)', 'phi_tnr(%)', 'phi_risc(%)') )
         for ii in range( len(phi_Tnr_PL_Array) ):
             file.write('{0:>15.5e} {1:>15.5e} {2:>15.5e} {3:>15.5e} {4:>15.5e} {5:>15.5e} {6:>15.5e} {7:>15.5e} {8:>15.5f} {9:>15.5f} {10:>15.5f} {11:>15.5f} {12:>15.5f} {13:>15.5f}\n'.format(ks_Array[ii], ksr_Array[ii], ksnr_Array[ii], kisc_Array[ii], kt_Array[ii], ktr_Array[ii], ktnr_Array[ii], krisc_Array[ii], phi_sr_Array[ii]*100, phi_snr_Array[ii]*100, phi_isc_Array[ii]*100, phi_tr_Array[ii]*100, phi_tnr_Array[ii]*100, phi_risc_Array[ii]*100) )
 
-def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, kisc_Array, kt_Array, ktr_Array, ktnr_Array, krisc_Array, phi_sr_Array, phi_snr_Array, phi_isc_Array, phi_tr_Array, phi_tnr_Array, phi_risc_Array):
-    if not os.path.isdir(fpath):
-        os.makedirs(fpath)
+def plot_data(fpath:str, 
+              fname:str , 
+              phi_Tnr_PL_Array:np.ndarray, 
+              ks_Array:np.ndarray, 
+              ksr_Array:np.ndarray, 
+              ksnr_Array:np.ndarray, 
+              kisc_Array:np.ndarray, 
+              kt_Array:np.ndarray, 
+              ktr_Array:np.ndarray, 
+              ktnr_Array:np.ndarray, 
+              krisc_Array:np.ndarray, 
+              phi_sr_Array:np.ndarray, 
+              phi_snr_Array:np.ndarray, 
+              phi_isc_Array:np.ndarray, 
+              phi_tr_Array:np.ndarray, 
+              phi_tnr_Array:np.ndarray, 
+              phi_risc_Array:np.ndarray,
+    ):
+    """
+    plot the data.
+
+    Args:
+        fpath: path to save the file
+        fname: name of the file
+        phi_Tnr_PL_Array: array of PLQY
+        ks_Array: array of rate constants
+        ksr_Array: array of rate constants
+        ksnr_Array: array of rate constants
+        kisc_Array: array of rate constants
+        kt_Array: array of rate constants
+        ktr_Array: array of rate constants
+        ktnr_Array: array of rate constants
+        krisc_Array: array of rate constants
+        phi_sr_Array: array of process efficiency
+        phi_snr_Array: array of process efficiency
+        phi_isc_Array: array of process efficiency
+        phi_tr_Array: array of process efficiency
+        phi_tnr_Array: array of process efficiency
+        phi_risc_Array: array of process efficiency
+
+    """
+    # write 
+    os.makedirs(fpath, exist_ok=True)
 
     # rate constants    
     fig = plt.figure()
@@ -527,7 +628,7 @@ def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, k
     ax.set_ylim(1e4,1e8)
     fig.tight_layout()
     fig.savefig(  os.path.join(fpath,fname + '_rate_constants') )
-    plt.close(fig)
+    plt.show(block=False)
 
     # qauntum yield
     # rate constants    
@@ -548,9 +649,9 @@ def plot_data(fpath, fname, phi_Tnr_PL_Array, ks_Array, ksr_Array, ksnr_Array, k
     plt.legend([r'$\Phi_{sr}$', r'$\Phi_{snr}$', r'$\Phi_{isc}$', r'$\Phi_{tr}$', r'$\Phi_{tnr}$', r'$\Phi_{risc}$'], fontsize=15)
     fig.tight_layout()
     fig.savefig(  os.path.join(fpath,fname + '_quantum_yield') )
-    plt.close(fig)
+    plt.show(block=False)
 
-def script(tau_PF, tau_DF, phi_PF, phi_DF, fpath='', fname=''):
+def script(tau_PF:float, tau_DF:float, phi_PF:float, phi_DF:float, fpath:str='', fname:str='')->dict[str, float]:
     PLQY = phi_PF+phi_DF
 
     kPF, kDF = tau2k([tau_PF, tau_DF])
@@ -589,8 +690,39 @@ def script(tau_PF, tau_DF, phi_PF, phi_DF, fpath='', fname=''):
                   kt_Array, ktr_Array, ktnr_Array, krisc_Array, 
                   phi_sr_Array, phi_snr_Array, phi_isc_Array, 
                   phi_tr_Array, phi_tnr_Array, phi_risc_Array)
-        
-def pulse_response_script(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, name=''):
+    
+    # return result
+    result = {'kPF':kPF, 
+              'kDF':kDF, 
+              'ks':ks_Array, 
+              'ksr':ksr_Array,
+              'ksnr':ksnr_Array,
+              'kisc':kisc_Array,
+              'kt':kt_Array,
+              'ktr':ktr_Array,
+              'ktnr':ktnr_Array,
+              'krisc':krisc_Array,
+              'phi_sr':phi_sr_Array,
+              'phi_snr':phi_snr_Array,
+              'phi_isc':phi_isc_Array,
+              'phi_tr':phi_tr_Array,
+              'phi_tnr':phi_tnr_Array,
+              'phi_risc':phi_risc_Array,
+              }
+    return result
+
+def pulse_response_script(
+        t:np.ndarray, 
+        ksr:float, 
+        ksnr:float, 
+        kisc:float, 
+        ktr:float, 
+        ktnr:float, 
+        krisc:float, 
+        alpha:float=1.0, 
+        G:float=1.0, 
+        name:str='',
+    ):
     S1_t, T1_t, caches = cal_pulse_response(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=alpha, G=G)
 
     fig = plt.figure()
@@ -606,7 +738,7 @@ def pulse_response_script(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0
     plt.ylim([G*1e-5, G*10])
 
     plt.legend([r'$[S_1](t)$', r'$[T_1](t)$'])
-    plt.show()
+    plt.show(block=False)
 
 if __name__ == '__main__':
 
