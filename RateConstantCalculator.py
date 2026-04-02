@@ -74,19 +74,19 @@ def IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL):
     #   a the loss ratio from triplet state by PL excitation. 
     #   
 
-    phi_Tnr_PL_Array = np.array( phi_Tnr_PL, dtype=np.float )
+    phi_Tnr_PL_Array = np.array( phi_Tnr_PL, dtype=float )
 
     ksr, ks, kt, kisckrisc = IntrinsicRateConstants_Determined(kPF, kDF, phi_PF, phi_DF)
-    
-    ksr = ksr * np.ones( phi_Tnr_PL_Array.size, dtype=np.float )
-    ks  = ks  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float )
-    kt  = kt  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float )
+
+    ksr = ksr * np.ones( phi_Tnr_PL_Array.size, dtype=float )
+    ks  = ks  * np.ones( phi_Tnr_PL_Array.size, dtype=float )
+    kt  = kt  * np.ones( phi_Tnr_PL_Array.size, dtype=float )
 
     kisc = (kisckrisc + phi_Tnr_PL_Array*kPF*kDF)/kt
     krisc = kisckrisc/kisc
     ksnr = ks - kisc - ksr
 
-    ktr = np.zeros( phi_Tnr_PL_Array.size, dtype=np.float )
+    ktr = np.zeros( phi_Tnr_PL_Array.size, dtype=float )
     ktnr = kt - krisc - ktr
 
     return ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc
@@ -168,9 +168,9 @@ def PulseResponse(t, ksr, ksnr, kisc, ktr, ktnr, krisc, alpha=1.0, G=1.0, F=1.0)
 
     # eigen vector
     V_PF = np.array( [ (ks-kDF) * S10 -   krisc  * T10,
-                        -kisc   * S10 + (kt-kDF) * T10] , dtype=np.float )/(kPF-kDF)
+                        -kisc   * S10 + (kt-kDF) * T10] , dtype=float )/(kPF-kDF)
     V_DF = np.array( [ (kPF-ks) * S10 +   krisc  * T10,
-                         kisc   * S10 + (kPF-kt) * T10] , dtype=np.float )/(kPF-kDF)
+                         kisc   * S10 + (kPF-kt) * T10] , dtype=float )/(kPF-kDF)
     
     # time series
     S1_t = V_PF[0] * np.exp( -kPF*t ) + V_DF[0] * np.exp( -kDF*t )
