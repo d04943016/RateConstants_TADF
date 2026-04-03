@@ -816,11 +816,13 @@ function toggleLeft() {
   leftOpen = !leftOpen;
   $('left_panel').classList.toggle('collapsed', !leftOpen);
   $('left_toggle').classList.toggle('active', !leftOpen);
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 250);
 }
 function toggleRight() {
   rightOpen = !rightOpen;
   $('right_panel').classList.toggle('collapsed', !rightOpen);
   $('right_toggle').classList.toggle('active', !rightOpen);
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 250);
 }
 
 // ── Accordion ─────────────────────────────────────────────────────────────────
@@ -1029,50 +1031,36 @@ function getTraceOverride(prefix, i) {
 function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
   const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
   const openFill = pubMode ? '#ffffff' : (currentTheme === 'dark' ? '#1a1d27' : '#ffffff');
+  // Size array: markerSize at every N-th point, 0 elsewhere (hides without affecting legend)
+  const sparseSize = Array.from({length: xArr.length}, (_, k) => k % markerEvery === 0 ? markerSize : 0);
 
-  const traces = [];
-  defs.forEach((def, i) => {
+  return defs.map((def, i) => {
     const ov       = getTraceOverride(prefix, i);
     const colorKey = pubMode ? 'pubC' : (currentTheme === 'dark' ? 'darkC' : 'lightC');
     const color    = ov.color ?? def[colorKey];
     const sym      = ov.sym   ?? def.sym;
     const isOpen   = sym.includes('open');
-    // Render open markers as filled symbol + white interior + colored edge
     const baseSym  = isOpen ? sym.replace('-open', '') : sym;
     const fillC    = isOpen ? openFill : color;
     const edgeW    = isOpen ? Math.max(1.5, lineWidth * 0.7) : 0;
-    const vis      = ov.visible ? true : 'legendonly';
-    const grp      = `${prefix}_${i}`;
-    // Hover shows just the y-value with trace name
-    const htpl     = isLog
-      ? `<b>${def.name}</b>: %{y:.3e} s⁻¹<extra></extra>`
-      : `<b>${def.name}</b>: %{y:.2f}%<extra></extra>`;
-
-    // Line trace — carries the legend entry
-    traces.push({
+    // Hover: show labeled x (Φ_Tnr) and y (value) on the same box
+    const htpl = isLog
+      ? `Φ<sub>Tnr</sub> = %{x:.2f}%<br><b>${def.name}</b> = %{y:.3e} s⁻¹<extra></extra>`
+      : `Φ<sub>Tnr</sub> = %{x:.2f}%<br><b>${def.name}</b> = %{y:.2f}%<extra></extra>`;
+    return {
       x: xArr, y: dataObj[def.key],
-      name: def.name, type: 'scatter', mode: 'lines',
-      visible: vis, showlegend: true, legendgroup: grp,
-      hoverinfo: 'skip',
-      line: { color, width: lineWidth, dash: def.dash },
-    });
-
-    // Sparse marker trace — no legend entry, shows hover
-    const sparseX = xArr.filter((_, k) => k % markerEvery === 0);
-    const sparseY = dataObj[def.key].filter((_, k) => k % markerEvery === 0);
-    traces.push({
-      x: sparseX, y: sparseY,
-      name: def.name, type: 'scatter', mode: 'markers',
-      visible: vis, showlegend: false, legendgroup: grp,
+      name: def.name, type: 'scatter', mode: 'lines+markers',
+      visible: ov.visible ? true : 'legendonly',
       hovertemplate: htpl,
+      line: { color, width: lineWidth, dash: def.dash },
       marker: {
-        symbol: baseSym, size: markerSize,
+        symbol: baseSym,
+        size: sparseSize,   // size=0 hides non-sparse; legend uses size[0] = markerSize
         color: fillC,
         line: { width: edgeW, color },
       },
-    });
+    };
   });
-  return traces;
 }
 
 function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
