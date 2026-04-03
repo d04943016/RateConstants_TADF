@@ -178,4 +178,5 @@ Thumbs.db #thumbnail cache on Windows
 .prof
 
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,python
+# End of https://www.toptal.com/developers/gitignore/api/macos,python.claude/worktrees/
+.DS_Store
