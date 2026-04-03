@@ -127,6 +127,7 @@
       color: var(--text-main); box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
     }
     .form-control.is-invalid { border-color: #f74f6a; }
+    .field-warn { border-color: #f74f6a !important; }
     .input-group-text {
       background: var(--border); border-color: var(--border);
       color: var(--text-muted); font-size: 0.82rem;
@@ -480,6 +481,7 @@
             <span id="lbl_sym_pf">Φ<sub>PF</sub></span>
             <span class="tip" id="tip_phi_pf"
               data-tip="Φ_PF — Measured fraction of total PLQY from the prompt emission component. Obtained by integrating B_PF·exp(−t/τ_PF) from the biexponential TRPL fit. Must satisfy Φ_PF + Φ_DF ≤ 100%.">i</span>
+            <span class="warn-tip" id="phi_pf_warn" style="display:none;" data-tip="">!</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_phi_pf" class="form-control" value="70" step="any" min="0" max="100" />
@@ -490,7 +492,7 @@
             <span id="lbl_sym_df">Φ<sub>DF</sub></span>
             <span class="tip" id="tip_phi_df"
               data-tip="Φ_DF — Measured fraction of total PLQY from the delayed emission component. Obtained from B_DF·exp(−t/τ_DF). Reflects triplet-harvesting efficiency via RISC. Must satisfy Φ_PF + Φ_DF ≤ 100%.">i</span>
-            <span class="warn-tip" id="phi_sum_warn" style="display:none;" data-tip="">!</span>
+            <span class="warn-tip" id="phi_df_warn" style="display:none;" data-tip="">!</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_phi_df" class="form-control" value="12" step="any" min="0" max="100" />
@@ -607,7 +609,7 @@
         </div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-bottom:0.45rem;">
           <span style="color:var(--accent);font-weight:700;">★</span>
-          k<sub>s</sub>, k<sub>sr</sub>, k<sub>t</sub> are <em>directly determined</em> — independent of assumed Φ<sub>Tnr</sub>.
+          k<sub>s</sub>, k<sub>sr</sub>, k<sub>t</sub> are <em>directly determined</em> — independent of assumed Φ<sub>Tnr</sub>.<br>
           k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>Tnr</sub>, k<sub>RISC</sub> depend on the assumed Φ<sub>Tnr</sub>.
         </div>
         <div class="table-responsive">
@@ -1043,6 +1045,9 @@ function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
     const color    = ov.color ?? def[colorKey];
     const sym      = ov.sym   ?? def.sym;
     const isOpen   = sym.includes('open');
+    // For "open" markers: use the filled base symbol with white interior + colored edge.
+    // This gives a proper opaque white fill instead of transparent.
+    const baseSym  = isOpen ? sym.replace('-open', '') : sym;
     return {
       x: xArr, y: dataObj[def.key],
       name: def.name, type: 'scatter', mode: 'lines+markers',
@@ -1050,10 +1055,10 @@ function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
       hovertemplate: htpl,
       line:   { color, width: lineWidth, dash: def.dash },
       marker: {
-        symbol: sym, size: markerSize,
+        symbol: baseSym, size: markerSize,
         color: isOpen ? openFill : color,
         opacity,
-        line: { width: isOpen ? Math.max(1.5, lineWidth*0.6) : 0, color },
+        line: { width: isOpen ? Math.max(1.5, lineWidth * 0.7) : 0, color },
       },
     };
   });
@@ -1164,8 +1169,6 @@ function buildPayload() {
   // Φ_PF + Φ_DF ≤ 100%
   const isQY = $('sel_qy_b').value === '0';
   if (isQY && ok && (phiPF + phiDF) > 100) {
-    $('inp_phi_pf').classList.add('is-invalid');
-    $('inp_phi_df').classList.add('is-invalid');
     showPhiWarn(`Φ_PF + Φ_DF = ${(phiPF+phiDF).toFixed(1)}% exceeds 100%. Both values are fractions of the total PLQY from the biexponential TRPL fit — their sum cannot exceed 100%.`);
     return null;
   }
@@ -1240,14 +1243,19 @@ function setLoading(on) {
 }
 function showError(msg) { const e=$('alertBox'); e.textContent=msg; e.style.display=''; }
 function showPhiWarn(msg) {
-  const el = $('phi_sum_warn');
-  el.dataset.tip = msg;
-  el.style.display = 'inline-flex';
+  ['phi_pf_warn','phi_df_warn'].forEach(id => {
+    const el = $(id); el.dataset.tip = msg; el.style.display = 'inline-flex';
+  });
+  $('inp_phi_pf').classList.add('field-warn');
+  $('inp_phi_df').classList.add('field-warn');
 }
 function hideError() {
   $('alertBox').style.display = 'none';
-  $('phi_sum_warn').style.display = 'none';
-  [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df'),$('inp_plqy')].forEach(el=>el.classList.remove('is-invalid'));
+  ['phi_pf_warn','phi_df_warn'].forEach(id => $(id).style.display = 'none');
+  [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df'),$('inp_plqy')].forEach(el => {
+    el.classList.remove('is-invalid');
+    el.classList.remove('field-warn');
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
