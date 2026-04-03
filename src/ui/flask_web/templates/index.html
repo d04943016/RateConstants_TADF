@@ -520,7 +520,7 @@
         <div id="analysis_body">
           <label class="form-label" style="margin-top:0.3rem;">
             Sweep Points
-            <span class="tip" data-tip="Number of Φ_Tnr points swept from 0 to max. More points give smoother curves but take slightly longer to compute.">i</span>
+            <span class="tip" data-tip="Number of Φ_Tnr points in the sweep from 0 to its maximum allowed value.">i</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_npts" class="form-control" value="200" step="10" min="10" max="2000" />
@@ -549,12 +549,12 @@
       <div class="kv-grid kv-grid-5">
         <div class="kv-item">
           <span class="kv-key">k<sub>PF</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="k_PF = 1/τ_PF — Fast eigenvalue of the coupled S₁/T₁ system. Equals the measured prompt fluorescence rate constant.">i</span></span>
+            data-tip="k_PF = 1/τ_PF — Prompt fluorescence rate constant, measured from the fast decay component of the biexponential TRPL fit.">i</span></span>
           <span class="kv-val" id="sv_kPF">—</span>
         </div>
         <div class="kv-item">
           <span class="kv-key">k<sub>DF</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="k_DF = 1/τ_DF — Slow eigenvalue. Equals the measured delayed fluorescence rate constant.">i</span></span>
+            data-tip="k_DF = 1/τ_DF — Delayed fluorescence rate constant, measured from the slow decay component of the biexponential TRPL fit.">i</span></span>
           <span class="kv-val" id="sv_kDF">—</span>
         </div>
         <div class="kv-item">
@@ -609,8 +609,8 @@
         </div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-bottom:0.45rem;">
           <span style="color:var(--accent);font-weight:700;">★</span>
-          k<sub>s</sub>, k<sub>sr</sub>, k<sub>t</sub> are <em>directly determined</em> — independent of assumed Φ<sub>Tnr</sub>.<br>
-          k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>Tnr</sub>, k<sub>RISC</sub> depend on the assumed Φ<sub>Tnr</sub>.
+          k<sub>s</sub>, k<sub>sr</sub>, k<sub>t</sub>, Φ<sub>sr</sub> are <em>directly determined</em> — independent of assumed Φ<sub>Tnr</sub>.<br>
+          k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>Tnr</sub>, k<sub>RISC</sub>, Φ<sub>ISC</sub>, Φ<sub>RISC</sub> depend on the assumed Φ<sub>Tnr</sub>.
         </div>
         <div class="table-responsive">
           <table class="table table-sm summary-table mb-0">
@@ -631,8 +631,8 @@
                 data-tip="Non-radiative triplet decay rate (s⁻¹). Rate of T₁→S₀ without RISC or phosphorescence. Increases with assumed Φ_Tnr.">i</span></th>
               <th>k<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
                 data-tip="Reverse ISC rate (s⁻¹). Thermally-activated T₁→S₁ upconversion — the key TADF step that enables triplet harvesting for fluorescence. Decreases with assumed Φ_Tnr.">i</span></th>
-              <th>Φ<sub>sr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
-                data-tip="Singlet radiative efficiency (%). Fraction of S₁ excitons that emit a photon: Φ_sr = k_sr/k_s. Represents the intrinsic radiative probability of the singlet state.">i</span></th>
+              <th class="th-direct">Φ<sub>sr</sub> ★ <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Singlet radiative efficiency (%). Fraction of S₁ excitons that emit a photon: Φ_sr = k_sr/k_s. Directly determined — independent of Φ_Tnr.">i</span></th>
               <th>Φ<sub>ISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
                 data-tip="ISC efficiency (%). Fraction of S₁ excitons that undergo spin-flip transfer to T₁: Φ_ISC = k_ISC/k_s. High Φ_ISC is needed to populate triplets for TADF.">i</span></th>
               <th>Φ<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
@@ -916,11 +916,11 @@ function onModeChange() {
 
   // Update tooltips
   $('tip_pf').dataset.tip = isK
-    ? 'k_PF — Measured prompt fluorescence rate constant (= 1/τ_PF). Fast eigenvalue of the coupled S₁/T₁ system, obtained from TCSPC biexponential fit.'
-    : 'τ_PF — Measured fast decay component from TCSPC/TRPL. The short-lived lifetime of the biexponential PL decay (~ns). A directly measured experimental observable.';
+    ? 'k_PF = 1/τ_PF — Prompt fluorescence rate constant, measured from the fast decay component of the biexponential TRPL fit.'
+    : 'τ_PF — Measured fast decay lifetime from the prompt fluorescence component of the biexponential TRPL fit (~ns).';
   $('tip_df').dataset.tip = isK
-    ? 'k_DF — Measured delayed fluorescence rate constant (= 1/τ_DF). Slow eigenvalue related to TADF triplet harvesting, obtained from TCSPC fit.'
-    : 'τ_DF — Measured slow decay component from TCSPC/TRPL. The long-lived lifetime of the biexponential PL decay (~µs). Observable arising from the T₁↔S₁ equilibrium.';
+    ? 'k_DF = 1/τ_DF — Delayed fluorescence rate constant, measured from the slow decay component of the biexponential TRPL fit.'
+    : 'τ_DF — Measured slow decay lifetime from the delayed fluorescence component of the biexponential TRPL fit (~µs).';
 }
 
 function onQYModeChange() {
@@ -1026,42 +1026,53 @@ function getTraceOverride(prefix, i) {
 }
 
 // ── Trace building ────────────────────────────────────────────────────────────
-function sparseOpacity(len, every) {
-  return Array.from({length:len}, (_,i) => i%every===0 ? 1 : 0);
-}
-
 function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
   const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
-  const opacity = sparseOpacity(xArr.length, markerEvery);
-  const htpl    = isLog
-    ? '%{x:.2f}% → %{y:.2e}<extra>%{fullData.name}</extra>'
-    : '%{x:.2f}% → %{y:.2f}%<extra>%{fullData.name}</extra>';
-  // Background fill for hollow markers
   const openFill = pubMode ? '#ffffff' : (currentTheme === 'dark' ? '#1a1d27' : '#ffffff');
 
-  return defs.map((def, i) => {
+  const traces = [];
+  defs.forEach((def, i) => {
     const ov       = getTraceOverride(prefix, i);
     const colorKey = pubMode ? 'pubC' : (currentTheme === 'dark' ? 'darkC' : 'lightC');
     const color    = ov.color ?? def[colorKey];
     const sym      = ov.sym   ?? def.sym;
     const isOpen   = sym.includes('open');
-    // For "open" markers: use the filled base symbol with white interior + colored edge.
-    // This gives a proper opaque white fill instead of transparent.
+    // Render open markers as filled symbol + white interior + colored edge
     const baseSym  = isOpen ? sym.replace('-open', '') : sym;
-    return {
+    const fillC    = isOpen ? openFill : color;
+    const edgeW    = isOpen ? Math.max(1.5, lineWidth * 0.7) : 0;
+    const vis      = ov.visible ? true : 'legendonly';
+    const grp      = `${prefix}_${i}`;
+    // Hover shows just the y-value with trace name
+    const htpl     = isLog
+      ? `<b>${def.name}</b>: %{y:.3e} s⁻¹<extra></extra>`
+      : `<b>${def.name}</b>: %{y:.2f}%<extra></extra>`;
+
+    // Line trace — carries the legend entry
+    traces.push({
       x: xArr, y: dataObj[def.key],
-      name: def.name, type: 'scatter', mode: 'lines+markers',
-      visible: ov.visible ? true : 'legendonly',
+      name: def.name, type: 'scatter', mode: 'lines',
+      visible: vis, showlegend: true, legendgroup: grp,
+      hoverinfo: 'skip',
+      line: { color, width: lineWidth, dash: def.dash },
+    });
+
+    // Sparse marker trace — no legend entry, shows hover
+    const sparseX = xArr.filter((_, k) => k % markerEvery === 0);
+    const sparseY = dataObj[def.key].filter((_, k) => k % markerEvery === 0);
+    traces.push({
+      x: sparseX, y: sparseY,
+      name: def.name, type: 'scatter', mode: 'markers',
+      visible: vis, showlegend: false, legendgroup: grp,
       hovertemplate: htpl,
-      line:   { color, width: lineWidth, dash: def.dash },
       marker: {
         symbol: baseSym, size: markerSize,
-        color: isOpen ? openFill : color,
-        opacity,
-        line: { width: isOpen ? Math.max(1.5, lineWidth * 0.7) : 0, color },
+        color: fillC,
+        line: { width: edgeW, color },
       },
-    };
+    });
   });
+  return traces;
 }
 
 function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
@@ -1106,6 +1117,11 @@ function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
       font:{size:fsLeg,color:textC}, traceorder:'normal',
     },
     margin: {t:46, b:52, l:72, r:110},
+    hoverlabel: {
+      bgcolor:     pubMode ? '#ffffff' : (currentTheme==='dark' ? '#22263a' : '#ffffff'),
+      bordercolor: pubMode ? '#aaaaaa' : (currentTheme==='dark' ? '#2e3250' : '#d0d3e8'),
+      font: { color: pubMode ? '#111111' : (currentTheme==='dark' ? '#e4e6f0' : '#1a1d27'), size: 12 },
+    },
   };
 }
 
