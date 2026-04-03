@@ -19,6 +19,7 @@
       --text-label: #b0b4cc;
       --text-sym:   #7db8ff;
       --shadow:     rgba(0,0,0,0.45);
+      --open-fill:  #1a1d27;
     }
     body.light {
       --accent:     #2563eb;
@@ -31,6 +32,7 @@
       --text-label: #3a3e58;
       --text-sym:   #2563eb;
       --shadow:     rgba(0,0,0,0.12);
+      --open-fill:  #ffffff;
     }
 
     /* ── Base ───────────────────────────────────────────── */
@@ -65,15 +67,13 @@
     .sidebar-tog:hover { background: var(--bg-input); border-color: var(--border); color: var(--accent); }
     .sidebar-tog.active { background: var(--bg-input); border-color: var(--accent); color: var(--accent); }
 
-    /* [| ] icon — CSS drawn panel icon */
+    /* [| ] icon */
     .pnl-icon {
       width: 18px; height: 14px; border: 1.5px solid currentColor;
       border-radius: 2px; display: inline-flex; flex-shrink: 0;
       overflow: hidden; vertical-align: middle;
     }
-    .pnl-icon .pnl-bar {
-      width: 6px; height: 100%; background: currentColor; opacity: 0.55; flex-shrink: 0;
-    }
+    .pnl-icon .pnl-bar { width: 6px; height: 100%; background: currentColor; opacity: 0.55; flex-shrink: 0; }
     .pnl-icon .pnl-space { flex: 1; }
 
     /* Header action buttons */
@@ -96,7 +96,6 @@
     .col-panel.right { width: 304px; border-left:  1px solid var(--border); }
     .col-panel.collapsed { width: 0 !important; }
 
-    /* Panel inner scrollable content (fixed width prevents reflow) */
     .panel-content {
       width: 282px; height: 100%; overflow-y: auto; overflow-x: hidden;
       padding: 0.8rem 0.9rem 2.5rem;
@@ -133,7 +132,6 @@
       color: var(--text-muted); font-size: 0.82rem;
       min-width: 2.2rem; justify-content: center;
     }
-    /* Unit select inside input-group */
     .unit-sel {
       background: var(--bg-input); border: 1px solid var(--border);
       border-left: none; color: var(--text-muted); font-size: 0.82rem;
@@ -149,6 +147,15 @@
       width: 15px; height: 15px; border-radius: 50%;
       background: var(--bg-input); border: 1px solid var(--border);
       color: var(--text-muted); font-size: 0.6rem; font-weight: 700;
+      cursor: default; user-select: none; flex-shrink: 0; vertical-align: middle;
+    }
+
+    /* ── Warning badge ───────────────────────────────────── */
+    .warn-tip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(247,79,106,0.12); border: 1.5px solid #f74f6a;
+      color: #f74f6a; font-size: 0.68rem; font-weight: 800;
       cursor: default; user-select: none; flex-shrink: 0; vertical-align: middle;
     }
 
@@ -197,7 +204,6 @@
     }
     .kv-grid { display: grid; gap: 0.2rem 0.5rem; }
     .kv-grid-5 { grid-template-columns: repeat(5, 1fr); }
-    .kv-grid-4 { grid-template-columns: repeat(4, 1fr); }
     .kv-item { display: flex; flex-direction: column; }
     .kv-key { font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.2rem; }
     .kv-val { font-size: 0.88rem; font-weight: 600; color: var(--text-main); font-family: monospace; }
@@ -237,6 +243,7 @@
     }
     .summary-table tbody tr:hover td { background: rgba(79,142,247,0.06) !important; color: var(--text-main); }
     .summary-table td:first-child { font-family: inherit; color: var(--text-muted); font-size: 0.79rem; }
+    .th-direct { color: var(--accent) !important; }
 
     /* ── Right panel: numeric controls ──────────────────── */
     .ctrl-section-label {
@@ -246,6 +253,7 @@
     }
     .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 0.5rem; margin-bottom: 0.1rem; }
     .ctrl-item label { font-size: 0.82rem; color: var(--text-label); display: block; margin-bottom: 0.12rem; }
+    .ctrl-span2 { grid-column: span 2; }
     .ni-wrap { display: flex; align-items: center; gap: 0.3rem; }
     .ni-wrap input[type=number], .ni-wrap select {
       background: var(--bg-input); border: 1px solid var(--border);
@@ -285,12 +293,12 @@
     /* ── Alert ───────────────────────────────────────────── */
     #alertBox { display: none; font-size: 0.84rem; }
 
-    /* ── Accordion (left panel) ──────────────────────────── */
+    /* ── Accordion (left + right panel) ─────────────────── */
     .acc-header {
       cursor: pointer; user-select: none;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .acc-header .arr { transition: transform 0.2s; font-size: 0.7rem; color: var(--text-muted); }
+    .acc-header .arr { transition: transform 0.2s; font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; text-transform: none; }
     .acc-header.closed .arr { transform: rotate(-90deg); }
 
     /* ── Theory Modal ────────────────────────────────────── */
@@ -398,7 +406,6 @@
 <!-- ── Header ── -->
 <div class="app-header">
   <div class="hdr-left">
-    <!-- Left panel toggle: [| ] icon -->
     <button class="sidebar-tog" id="left_toggle" onclick="toggleLeft()" title="Toggle left panel">
       <span class="pnl-icon"><span class="pnl-bar"></span><span class="pnl-space"></span></span>
     </button>
@@ -410,7 +417,6 @@
   <div class="hdr-right">
     <button class="hdr-btn" id="btn_theory" onclick="openTheory()">📖 Theory</button>
     <button class="hdr-btn" id="btn_theme" onclick="toggleTheme()">🌙 Dark Mode</button>
-    <!-- Right panel toggle: [ |] icon -->
     <button class="sidebar-tog" id="right_toggle" onclick="toggleRight()" title="Toggle right panel">
       <span class="pnl-icon"><span class="pnl-space"></span><span class="pnl-bar"></span></span>
     </button>
@@ -484,6 +490,7 @@
             <span id="lbl_sym_df">Φ<sub>DF</sub></span>
             <span class="tip" id="tip_phi_df"
               data-tip="Φ_DF — Measured fraction of total PLQY from the delayed emission component. Obtained from B_DF·exp(−t/τ_DF). Reflects triplet-harvesting efficiency via RISC. Must satisfy Φ_PF + Φ_DF ≤ 100%.">i</span>
+            <span class="warn-tip" id="phi_sum_warn" style="display:none;" data-tip="">!</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_phi_df" class="form-control" value="12" step="any" min="0" max="100" />
@@ -503,11 +510,24 @@
         </div>
       </div>
 
-      <!-- Filename + Actions -->
-      <div class="mb-2">
-        <label style="font-size:0.82rem;color:var(--text-label);">Output Filename</label>
-        <input type="text" id="inp_fname" class="form-control form-control-sm mb-2" value="results" placeholder="results">
+      <!-- Analysis -->
+      <div class="mb-3">
+        <div class="section-label acc-header" id="analysis_hdr" onclick="toggleAcc('analysis_body','analysis_hdr')">
+          <span>Analysis</span><span class="arr">▾</span>
+        </div>
+        <div id="analysis_body">
+          <label class="form-label" style="margin-top:0.3rem;">
+            Sweep Points
+            <span class="tip" data-tip="Number of Φ_Tnr points swept from 0 to max. More points give smoother curves but take slightly longer to compute.">i</span>
+          </label>
+          <div class="input-group input-group-sm mb-2">
+            <input type="number" id="inp_npts" class="form-control" value="200" step="10" min="10" max="2000" />
+            <span class="input-group-text">pts</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Actions -->
       <button id="btn_calc" class="btn-calculate mb-2">
         <span id="calc_spinner" class="spinner-border me-2" role="status" style="display:none;"></span>
         Calculate
@@ -553,35 +573,6 @@
       </div>
     </div>
 
-    <!-- Directly determined constants bar -->
-    <div class="result-bar" id="bar_direct">
-      <div class="result-bar-title">Directly Determined Constants
-        <span style="font-weight:400;text-transform:none;letter-spacing:0;">(independent of Φ<sub>Tnr</sub>)</span>
-      </div>
-      <div class="kv-grid kv-grid-4">
-        <div class="kv-item">
-          <span class="kv-key">k<sub>sr</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="Radiative rate S₁→S₀. Directly from kPF, kDF, ΦPF, ΦDF: k_sr = k_PF·Φ_PF + k_DF·Φ_DF.">i</span></span>
-          <span class="kv-val" id="sv_ksr">—</span>
-        </div>
-        <div class="kv-item">
-          <span class="kv-key">k<sub>s</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="Total singlet decay rate = k_sr + k_snr + k_ISC. Directly determined: k_s = (k_PF²·Φ_PF + k_DF²·Φ_DF)/k_sr.">i</span></span>
-          <span class="kv-val" id="sv_ks">—</span>
-        </div>
-        <div class="kv-item">
-          <span class="kv-key">k<sub>t</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="Total triplet decay rate = k_Tnr + k_RISC. Directly: k_t = (Φ_PF+Φ_DF)·k_PF·k_DF/k_sr.">i</span></span>
-          <span class="kv-val" id="sv_kt">—</span>
-        </div>
-        <div class="kv-item">
-          <span class="kv-key">k<sub>ISC</sub>·k<sub>RISC</sub> <span class="tip" style="width:13px;height:13px;font-size:0.55rem;"
-            data-tip="Product of ISC × RISC rates. Uniquely determined; individual values require additional assumption (Φ_Tnr sweep).">i</span></span>
-          <span class="kv-val" id="sv_kisc_krisc">—</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Pre-calculate placeholder -->
     <div class="pre-calc-msg" id="pre_calc_msg">
       <div class="ph-icons"><span>📊</span><span>📈</span></div>
@@ -611,23 +602,39 @@
     <!-- Summary table -->
     <div class="table-section" id="table_section">
       <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.95rem;">
-        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.5rem;">
+        <div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.2rem;">
           Rate Constants &amp; Efficiencies at Boundary Conditions
+        </div>
+        <div style="font-size:0.74rem;color:var(--text-muted);margin-bottom:0.45rem;">
+          <span style="color:var(--accent);font-weight:700;">★</span>
+          k<sub>s</sub>, k<sub>sr</sub>, k<sub>t</sub> are <em>directly determined</em> — independent of assumed Φ<sub>Tnr</sub>.
+          k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>Tnr</sub>, k<sub>RISC</sub> depend on the assumed Φ<sub>Tnr</sub>.
         </div>
         <div class="table-responsive">
           <table class="table table-sm summary-table mb-0">
             <thead><tr>
-              <th style="min-width:120px">Condition</th>
-              <th>k<sub>s</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Total singlet decay rate (s⁻¹). k_s = k_sr + k_snr + k_ISC.">i</span></th>
-              <th>k<sub>sr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Radiative singlet decay rate (s⁻¹). Uniquely determined from experiment.">i</span></th>
-              <th>k<sub>snr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Non-radiative singlet decay rate (s⁻¹). Internal conversion S₁→S₀.">i</span></th>
-              <th>k<sub>ISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Intersystem crossing rate S₁→T₁ (s⁻¹). Depends on assumed Φ_Tnr.">i</span></th>
-              <th>k<sub>t</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Total triplet decay rate (s⁻¹). k_t = k_Tnr + k_RISC. Uniquely determined.">i</span></th>
-              <th>k<sub>Tnr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Non-radiative triplet decay rate (s⁻¹). Increases with assumed Φ_Tnr.">i</span></th>
-              <th>k<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Reverse ISC rate T₁→S₁ (s⁻¹). Thermally activated TADF key step. Decreases with assumed Φ_Tnr.">i</span></th>
-              <th>Φ<sub>sr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="Singlet radiative efficiency = k_sr/k_s (%).">i</span></th>
-              <th>Φ<sub>ISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="ISC efficiency = k_ISC/k_s (%).">i</span></th>
-              <th>Φ<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;" data-tip="RISC efficiency = k_RISC/k_t (%). Key TADF figure of merit.">i</span></th>
+              <th style="min-width:120px">Condition <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Φ_Tnr — Assumed fraction of T₁ excitons lost to non-radiative decay. Setting Φ_Tnr = 0 means all triplets eventually return to S₁ (upper bound for RISC). Max value is constrained by PLQY.">i</span></th>
+              <th class="th-direct">k<sub>s</sub> ★ <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Total singlet decay rate (s⁻¹). Sum of all S₁ depopulation channels: k_s = k_sr + k_snr + k_ISC. Directly determined from experiment, independent of Φ_Tnr.">i</span></th>
+              <th class="th-direct">k<sub>sr</sub> ★ <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Singlet radiative rate (s⁻¹). Rate of photon emission from S₁→S₀. Directly determined from experiment, independent of Φ_Tnr.">i</span></th>
+              <th>k<sub>snr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Non-radiative singlet decay rate (s⁻¹). Rate of internal conversion S₁→S₀ without photon emission. Depends on assumed Φ_Tnr.">i</span></th>
+              <th>k<sub>ISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Intersystem crossing rate (s⁻¹). Rate of spin-flip transfer S₁→T₁. Depends on assumed Φ_Tnr.">i</span></th>
+              <th class="th-direct">k<sub>t</sub> ★ <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Total triplet decay rate (s⁻¹). Sum of all T₁ depopulation channels: k_t = k_Tnr + k_RISC. Directly determined from experiment, independent of Φ_Tnr.">i</span></th>
+              <th>k<sub>Tnr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Non-radiative triplet decay rate (s⁻¹). Rate of T₁→S₀ without RISC or phosphorescence. Increases with assumed Φ_Tnr.">i</span></th>
+              <th>k<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Reverse ISC rate (s⁻¹). Thermally-activated T₁→S₁ upconversion — the key TADF step that enables triplet harvesting for fluorescence. Decreases with assumed Φ_Tnr.">i</span></th>
+              <th>Φ<sub>sr</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="Singlet radiative efficiency (%). Fraction of S₁ excitons that emit a photon: Φ_sr = k_sr/k_s. Represents the intrinsic radiative probability of the singlet state.">i</span></th>
+              <th>Φ<sub>ISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="ISC efficiency (%). Fraction of S₁ excitons that undergo spin-flip transfer to T₁: Φ_ISC = k_ISC/k_s. High Φ_ISC is needed to populate triplets for TADF.">i</span></th>
+              <th>Φ<sub>RISC</sub> <span class="tip" style="width:12px;height:12px;font-size:0.5rem;"
+                data-tip="RISC efficiency (%). Fraction of T₁ excitons that thermally upconvert back to S₁: Φ_RISC = k_RISC/k_t. This is the key TADF figure of merit — high Φ_RISC means efficient triplet harvesting.">i</span></th>
             </tr></thead>
             <tbody id="summary_tbody"></tbody>
           </table>
@@ -643,72 +650,114 @@
 
       <div class="section-label">Figure Controls</div>
 
-      <div class="ctrl-section-label" style="margin-top:0;">Lines &amp; Markers</div>
-      <div class="ctrl-grid">
-        <div class="ctrl-item"><label>Line Width</label>
-          <div class="ni-wrap"><input type="number" id="inp_lw" min="0.5" max="10" step="0.5" value="2.5" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
-        </div>
-        <div class="ctrl-item"><label>Marker Size</label>
-          <div class="ni-wrap"><input type="number" id="inp_ms" min="2" max="24" step="1" value="8" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
-        </div>
-        <div class="ctrl-item"><label>Marker Every</label>
-          <div class="ni-wrap"><input type="number" id="inp_mi" min="1" max="200" step="1" value="20" oninput="onSettingChange()"><span class="ni-unit">pts</span></div>
-        </div>
-        <div class="ctrl-item"><label>Frame Width</label>
-          <div class="ni-wrap"><input type="number" id="inp_fw" min="0.5" max="5" step="0.5" value="1.5" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
-        </div>
+      <!-- Lines & Markers -->
+      <div class="ctrl-section-label acc-header" id="rc_lm_hdr" onclick="toggleAcc('rc_lm_body','rc_lm_hdr')" style="margin-top:0;">
+        <span>Lines &amp; Markers</span><span class="arr">▾</span>
       </div>
-
-      <div class="ctrl-section-label">Font Sizes</div>
-      <div class="ctrl-grid">
-        <div class="ctrl-item"><label>Title</label>
-          <div class="ni-wrap"><input type="number" id="inp_fs_title" min="6" max="32" step="1" value="14" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
-        </div>
-        <div class="ctrl-item"><label>Axis Label</label>
-          <div class="ni-wrap"><input type="number" id="inp_fs_axis" min="6" max="28" step="1" value="12" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
-        </div>
-        <div class="ctrl-item"><label>Tick</label>
-          <div class="ni-wrap"><input type="number" id="inp_fs_tick" min="5" max="24" step="1" value="11" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
-        </div>
-        <div class="ctrl-item"><label>Legend</label>
-          <div class="ni-wrap"><input type="number" id="inp_fs_leg" min="5" max="24" step="1" value="11" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
-        </div>
-        <div class="ctrl-item"><label>Font Weight</label>
-          <div class="ni-wrap">
-            <select id="sel_fw" onchange="onSettingChange()">
-              <option value="400" selected>Normal</option>
-              <option value="500">Medium</option>
-              <option value="700">Bold</option>
-            </select>
+      <div id="rc_lm_body">
+        <div class="ctrl-grid">
+          <div class="ctrl-item"><label>Line Width</label>
+            <div class="ni-wrap"><input type="number" id="inp_lw" min="0.5" max="10" step="0.5" value="2.5" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
+          </div>
+          <div class="ctrl-item"><label>Marker Size</label>
+            <div class="ni-wrap"><input type="number" id="inp_ms" min="2" max="24" step="1" value="8" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
+          </div>
+          <div class="ctrl-item"><label>Marker Every</label>
+            <div class="ni-wrap"><input type="number" id="inp_mi" min="1" max="200" step="1" value="20" oninput="onSettingChange()"><span class="ni-unit">pts</span></div>
+          </div>
+          <div class="ctrl-item"><label>Frame Width</label>
+            <div class="ni-wrap"><input type="number" id="inp_fw" min="0.5" max="5" step="0.5" value="1.5" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
+          </div>
+          <div class="ctrl-item ctrl-span2"><label>Aspect Ratio</label>
+            <div class="ni-wrap">
+              <select id="sel_ar" onchange="onSettingChange()" style="width:120px;">
+                <option value="4/3" selected>4 : 3</option>
+                <option value="3/2">3 : 2</option>
+                <option value="16/9">16 : 9</option>
+                <option value="1/1">1 : 1</option>
+                <option value="sqrt(2)">A4 (1:√2)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="ctrl-section-label">Axis Ranges <span style="font-weight:400;text-transform:none;letter-spacing:0;">(blank = auto)</span></div>
-      <div class="range-grid">
-        <div><label>X min</label><input type="number" id="inp_xmin" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
-        <div><label>X max</label><input type="number" id="inp_xmax" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
-        <div><label>Y min (k)</label><input type="number" id="inp_ymin_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
-        <div><label>Y max (k)</label><input type="number" id="inp_ymax_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
-        <div><label>Y min (Φ)</label><input type="number" id="inp_ymin_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
-        <div><label>Y max (Φ)</label><input type="number" id="inp_ymax_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+      <!-- Font Sizes -->
+      <div class="ctrl-section-label acc-header" id="rc_fs_hdr" onclick="toggleAcc('rc_fs_body','rc_fs_hdr')">
+        <span>Font Sizes</span><span class="arr">▾</span>
       </div>
-
-      <div class="ctrl-section-label">Export</div>
-      <div class="ctrl-grid mb-2">
-        <div class="ctrl-item"><label>Width</label>
-          <div class="ni-wrap"><input type="number" id="inp_er" min="400" max="6000" step="100" value="1600" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
+      <div id="rc_fs_body">
+        <div class="ctrl-grid">
+          <div class="ctrl-item"><label>Title</label>
+            <div class="ni-wrap"><input type="number" id="inp_fs_title" min="6" max="32" step="1" value="14" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
+          </div>
+          <div class="ctrl-item"><label>Axis Label</label>
+            <div class="ni-wrap"><input type="number" id="inp_fs_axis" min="6" max="28" step="1" value="12" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
+          </div>
+          <div class="ctrl-item"><label>Tick</label>
+            <div class="ni-wrap"><input type="number" id="inp_fs_tick" min="5" max="24" step="1" value="11" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
+          </div>
+          <div class="ctrl-item"><label>Legend</label>
+            <div class="ni-wrap"><input type="number" id="inp_fs_leg" min="5" max="24" step="1" value="11" oninput="onSettingChange()"><span class="ni-unit">pt</span></div>
+          </div>
+          <div class="ctrl-item"><label>Font Weight</label>
+            <div class="ni-wrap">
+              <select id="sel_fw" onchange="onSettingChange()">
+                <option value="400" selected>Normal</option>
+                <option value="500">Medium</option>
+                <option value="700">Bold</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="form-check pub-check mb-3">
-        <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
-        <label class="form-check-label" for="chk_pub">Publication Mode (white bg)</label>
+
+      <!-- Axis Ranges -->
+      <div class="ctrl-section-label acc-header" id="rc_ax_hdr" onclick="toggleAcc('rc_ax_body','rc_ax_hdr')">
+        <span>Axis Ranges <span style="font-weight:400;text-transform:none;letter-spacing:0;">(blank=auto)</span></span><span class="arr">▾</span>
+      </div>
+      <div id="rc_ax_body">
+        <div class="range-grid">
+          <div><label>X min</label><input type="number" id="inp_xmin" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+          <div><label>X max</label><input type="number" id="inp_xmax" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+          <div><label>Y min (k)</label><input type="number" id="inp_ymin_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+          <div><label>Y max (k)</label><input type="number" id="inp_ymax_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+          <div><label>Y min (Φ)</label><input type="number" id="inp_ymin_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+          <div><label>Y max (Φ)</label><input type="number" id="inp_ymax_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        </div>
       </div>
 
-      <div class="ctrl-section-label">Trace Styles — Rate Constants</div>
-      <div id="trace_ctrl_rc"></div>
-      <div class="ctrl-section-label" style="margin-top:0.5rem;">Trace Styles — Efficiency</div>
-      <div id="trace_ctrl_qy"></div>
+      <!-- Export -->
+      <div class="ctrl-section-label acc-header" id="rc_exp_hdr" onclick="toggleAcc('rc_exp_body','rc_exp_hdr')">
+        <span>Export</span><span class="arr">▾</span>
+      </div>
+      <div id="rc_exp_body">
+        <div class="ctrl-grid mb-2">
+          <div class="ctrl-item"><label>Width</label>
+            <div class="ni-wrap"><input type="number" id="inp_er" min="400" max="6000" step="100" value="1600" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
+          </div>
+        </div>
+        <div class="form-check pub-check mb-2">
+          <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
+          <label class="form-check-label" for="chk_pub">Publication Mode (white bg)</label>
+        </div>
+      </div>
+
+      <!-- Trace Styles — Rate Constants -->
+      <div class="ctrl-section-label acc-header" id="rc_tc_hdr" onclick="toggleAcc('rc_tc_body','rc_tc_hdr')">
+        <span>Trace Styles — Rate Constants</span><span class="arr">▾</span>
+      </div>
+      <div id="rc_tc_body">
+        <div id="trace_ctrl_rc"></div>
+      </div>
+
+      <!-- Trace Styles — Efficiency -->
+      <div class="ctrl-section-label acc-header" id="qy_tc_hdr" onclick="toggleAcc('qy_tc_body','qy_tc_hdr')">
+        <span>Trace Styles — Efficiency</span><span class="arr">▾</span>
+      </div>
+      <div id="qy_tc_body">
+        <div id="trace_ctrl_qy"></div>
+      </div>
 
     </div>
   </div><!-- /right_panel -->
@@ -724,7 +773,7 @@ const fmt = (v, d=3) => v.toExponential(d);
 (function initTooltips() {
   const tip = $('g_tip');
   document.addEventListener('mouseover', e => {
-    const el = e.target.closest('.tip');
+    const el = e.target.closest('.tip, .warn-tip');
     if (!el) return;
     const text = el.dataset.tip;
     if (!text) return;
@@ -740,7 +789,7 @@ const fmt = (v, d=3) => v.toExponential(d);
     tip.style.top  = top + 'px';
   });
   document.addEventListener('mouseout', e => {
-    if (!e.target.closest('.tip')) return;
+    if (!e.target.closest('.tip, .warn-tip')) return;
     tip.style.display = 'none';
   });
 })();
@@ -781,7 +830,6 @@ function toggleAcc(bodyId, hdrId) {
 }
 
 // ── Unit definitions ──────────────────────────────────────────────────────────
-// factor: multiply user value by this to get SI (seconds or s⁻¹)
 const LIFETIME_UNITS_PF = [
   {label:'ps', factor:1e-12},
   {label:'ns', factor:1e-9,  sel:true},
@@ -808,23 +856,63 @@ const RATE_UNITS_DF = [
   {label:'10⁶/s',  factor:1e6},
 ];
 
-function populateUnitSel(selId, units) {
+function populateUnitSel(selId, units, forceDefault) {
   const sel = $(selId);
-  const prev = sel.value; // preserve selection if possible
+  const prev = forceDefault ? null : sel.value;
   sel.innerHTML = units.map(u =>
     `<option value="${u.factor}"${u.factor == prev ? ' selected' : (u.sel && !prev ? ' selected' : '')}>${u.label}</option>`
   ).join('');
-  // if prev wasn't in new options, pick default
   if (!units.some(u => u.factor == sel.value)) {
     const def = units.find(u => u.sel) || units[0];
     sel.value = def.factor;
   }
 }
 
+// ── Mode switching with value conversion ──────────────────────────────────────
+let _prevLFMode = null; // null = not yet initialized
+
 function onModeChange() {
   const isK = $('sel_lf_k').value === '1';
-  populateUnitSel('unit_pf', isK ? RATE_UNITS_PF  : LIFETIME_UNITS_PF);
-  populateUnitSel('unit_df', isK ? RATE_UNITS_DF  : LIFETIME_UNITS_DF);
+
+  if (_prevLFMode !== null && _prevLFMode !== isK) {
+    // Mode actually changed — convert current values to SI then to new units
+    const pfRaw = parseFloat($('inp_pf').value);
+    const dfRaw = parseFloat($('inp_df').value);
+    const pfFactor = parseFloat($('unit_pf').value);
+    const dfFactor = parseFloat($('unit_df').value);
+
+    // Populate new unit selects (force default selection)
+    populateUnitSel('unit_pf', isK ? RATE_UNITS_PF : LIFETIME_UNITS_PF, true);
+    populateUnitSel('unit_df', isK ? RATE_UNITS_DF : LIFETIME_UNITS_DF, true);
+    const newPfU = parseFloat($('unit_pf').value);
+    const newDfU = parseFloat($('unit_df').value);
+
+    if (isK) {
+      // Was lifetime → now rate: k = 1/τ
+      if (pfRaw > 0 && pfFactor > 0) {
+        const kPF_si = 1 / (pfRaw * pfFactor);
+        $('inp_pf').value = (kPF_si / newPfU).toPrecision(4);
+      }
+      if (dfRaw > 0 && dfFactor > 0) {
+        const kDF_si = 1 / (dfRaw * dfFactor);
+        $('inp_df').value = (kDF_si / newDfU).toPrecision(4);
+      }
+    } else {
+      // Was rate → now lifetime: τ = 1/k
+      const kPF_si = pfRaw * pfFactor;
+      const kDF_si = dfRaw * dfFactor;
+      if (kPF_si > 0) $('inp_pf').value = (1 / kPF_si / newPfU).toPrecision(4);
+      if (kDF_si > 0) $('inp_df').value = (1 / kDF_si / newDfU).toPrecision(4);
+    }
+  } else {
+    // Initial call — just populate unit selects without converting
+    populateUnitSel('unit_pf', isK ? RATE_UNITS_PF : LIFETIME_UNITS_PF);
+    populateUnitSel('unit_df', isK ? RATE_UNITS_DF : LIFETIME_UNITS_DF);
+  }
+
+  _prevLFMode = isK;
+
+  // Update tooltips
   $('tip_pf').dataset.tip = isK
     ? 'k_PF — Measured prompt fluorescence rate constant (= 1/τ_PF). Fast eigenvalue of the coupled S₁/T₁ system, obtained from TCSPC biexponential fit.'
     : 'τ_PF — Measured fast decay component from TCSPC/TRPL. The short-lived lifetime of the biexponential PL decay (~ns). A directly measured experimental observable.';
@@ -863,6 +951,7 @@ function getSettings() {
     fontWeight:  parseInt($('sel_fw')?.value ?? '400'),
     exportWidth: ni('inp_er')       ?? 1600,
     pubMode:     $('chk_pub').checked,
+    aspectRatio: $('sel_ar')?.value ?? '4/3',
     xMin: ni('inp_xmin'), xMax: ni('inp_xmax'),
     yMinRC: ni('inp_ymin_rc'), yMaxRC: ni('inp_ymax_rc'),
     yMinQY: ni('inp_ymin_qy'), yMaxQY: ni('inp_ymax_qy'),
@@ -874,8 +963,16 @@ function applyFontWeight(weight) {
     `.js-plotly-plot text { font-weight: ${weight} !important; }`;
 }
 
+function applyAspectRatio(ratio) {
+  // ratio e.g. "4/3", "16/9", "sqrt(2)"
+  const css = ratio === 'sqrt(2)' ? String(Math.SQRT2) : ratio;
+  ['chart_rc','chart_qy'].forEach(id => { const el=$(id); if(el) el.style.aspectRatio = css; });
+}
+
 function onSettingChange() {
-  applyFontWeight(getSettings().fontWeight);
+  const cfg = getSettings();
+  applyFontWeight(cfg.fontWeight);
+  applyAspectRatio(cfg.aspectRatio);
   if (_lastData) renderResults(_lastData);
 }
 
@@ -930,17 +1027,22 @@ function getTraceOverride(prefix, i) {
 function sparseOpacity(len, every) {
   return Array.from({length:len}, (_,i) => i%every===0 ? 1 : 0);
 }
+
 function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
   const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
   const opacity = sparseOpacity(xArr.length, markerEvery);
   const htpl    = isLog
     ? '%{x:.2f}% → %{y:.2e}<extra>%{fullData.name}</extra>'
     : '%{x:.2f}% → %{y:.2f}%<extra>%{fullData.name}</extra>';
+  // Background fill for hollow markers
+  const openFill = pubMode ? '#ffffff' : (currentTheme === 'dark' ? '#1a1d27' : '#ffffff');
+
   return defs.map((def, i) => {
-    const ov    = getTraceOverride(prefix, i);
+    const ov       = getTraceOverride(prefix, i);
     const colorKey = pubMode ? 'pubC' : (currentTheme === 'dark' ? 'darkC' : 'lightC');
-    const color = ov.color ?? def[colorKey];
-    const sym   = ov.sym   ?? def.sym;
+    const color    = ov.color ?? def[colorKey];
+    const sym      = ov.sym   ?? def.sym;
+    const isOpen   = sym.includes('open');
     return {
       x: xArr, y: dataObj[def.key],
       name: def.name, type: 'scatter', mode: 'lines+markers',
@@ -948,8 +1050,10 @@ function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
       hovertemplate: htpl,
       line:   { color, width: lineWidth, dash: def.dash },
       marker: {
-        symbol: sym, size: markerSize, color, opacity,
-        line: { width: sym.includes('open') ? Math.max(1.5, lineWidth*0.6) : 0, color },
+        symbol: sym, size: markerSize,
+        color: isOpen ? openFill : color,
+        opacity,
+        line: { width: isOpen ? Math.max(1.5, lineWidth*0.6) : 0, color },
       },
     };
   });
@@ -1022,31 +1126,33 @@ $('btn_calc').addEventListener('click', async () => {
 // ── Download data ─────────────────────────────────────────────────────────────
 $('btn_dl').addEventListener('click', async () => {
   const payload = buildPayload(); if (!payload) return;
-  payload.filename = $('inp_fname').value.trim() || 'results';
+  payload.filename = 'results';
   try {
     const res = await fetch('/api/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     if (!res.ok) { const j=await res.json(); throw new Error(j.message); }
     const blob=await res.blob(), a=document.createElement('a');
-    a.href=URL.createObjectURL(blob); a.download=payload.filename+'.txt'; a.click();
+    a.href=URL.createObjectURL(blob); a.download='results.txt'; a.click();
   } catch(err) { showError(err.message); }
 });
 
 function downloadChart(divId, suffix, format='png') {
-  const cfg=getSettings();
-  Plotly.downloadImage(divId,{format,width:cfg.exportWidth,height:Math.round(cfg.exportWidth*0.75),
-    filename:($('inp_fname').value.trim()||'results')+'_'+suffix});
+  const cfg = getSettings();
+  const div = $(divId);
+  const w = div.offsetWidth || 800;
+  const scale = cfg.exportWidth / w;
+  Plotly.downloadImage(divId, {format, scale, filename: 'results_' + suffix});
 }
 
 // ── Build payload ─────────────────────────────────────────────────────────────
 function buildPayload() {
-  const isK   = $('sel_lf_k').value === '1';
-  const pfRaw = parseFloat($('inp_pf').value);
-  const dfRaw = parseFloat($('inp_df').value);
+  const isK    = $('sel_lf_k').value === '1';
+  const pfRaw  = parseFloat($('inp_pf').value);
+  const dfRaw  = parseFloat($('inp_df').value);
   const pfFactor = parseFloat($('unit_pf').value);
   const dfFactor = parseFloat($('unit_df').value);
-  const phiPF = parseFloat($('inp_phi_pf').value);
-  const phiDF = parseFloat($('inp_phi_df').value);
-  const plqy  = parseFloat($('inp_plqy').value);
+  const phiPF  = parseFloat($('inp_phi_pf').value);
+  const phiDF  = parseFloat($('inp_phi_df').value);
+  const plqy   = parseFloat($('inp_plqy').value);
 
   let ok = true;
   [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df')].forEach(el => {
@@ -1060,22 +1166,20 @@ function buildPayload() {
   if (isQY && ok && (phiPF + phiDF) > 100) {
     $('inp_phi_pf').classList.add('is-invalid');
     $('inp_phi_df').classList.add('is-invalid');
-    showError(`Φ_PF + Φ_DF = ${(phiPF+phiDF).toFixed(1)}% exceeds 100%. Please check quantum yield values.`);
+    showPhiWarn(`Φ_PF + Φ_DF = ${(phiPF+phiDF).toFixed(1)}% exceeds 100%. Both values are fractions of the total PLQY from the biexponential TRPL fit — their sum cannot exceed 100%.`);
     return null;
   }
 
   if (!ok) { showError('Please correct the highlighted fields.'); return null; }
 
-  // Convert units to what the backend expects:
-  // Lifetime mode: backend expects ns (PF) and µs (DF)
-  // Rate mode: backend expects ×10⁸/s (PF) and ×10⁵/s (DF)
+  // Convert to backend-expected units
   let pf_value, df_value;
   if (isK) {
-    pf_value = pfRaw * pfFactor / 1e8;  // convert to ×10⁸/s
-    df_value = dfRaw * dfFactor / 1e5;  // convert to ×10⁵/s
+    pf_value = pfRaw * pfFactor / 1e8;  // → ×10⁸/s
+    df_value = dfRaw * dfFactor / 1e5;  // → ×10⁵/s
   } else {
-    pf_value = pfRaw * pfFactor / 1e-9; // convert to ns
-    df_value = dfRaw * dfFactor / 1e-6; // convert to µs
+    pf_value = pfRaw * pfFactor / 1e-9; // → ns
+    df_value = dfRaw * dfFactor / 1e-6; // → µs
   }
 
   return {
@@ -1083,6 +1187,7 @@ function buildPayload() {
     mode_qy_b: parseInt($('sel_qy_b').value),
     pf_value, df_value,
     phi_pf_value: phiPF, phi_df_value: phiDF, plqy_value: plqy,
+    n_points: Math.max(10, parseInt($('inp_npts')?.value) || 200),
   };
 }
 
@@ -1094,7 +1199,6 @@ function renderResults(d) {
   $('pre_calc_msg').style.display  = 'none';
   $('charts_row').style.display    = '';
   $('bar_inputs').style.display    = 'block';
-  $('bar_direct').style.display    = 'block';
   $('table_section').style.display = 'block';
 
   $('sv_kPF').textContent   = fmt(d.kPF) + ' /s';
@@ -1103,14 +1207,9 @@ function renderResults(d) {
   $('sv_PhiDF').textContent = d.Phi_DF.toFixed(2) + ' %';
   $('sv_PLQY').textContent  = d.PLQY.toFixed(2) + ' %';
 
-  const rc0 = d.rate_constants;
-  $('sv_ksr').textContent       = fmt(rc0.ksr[0]) + ' /s';
-  $('sv_ks').textContent        = fmt(rc0.ks[0])  + ' /s';
-  $('sv_kt').textContent        = fmt(rc0.kt[0])  + ' /s';
-  $('sv_kisc_krisc').textContent = fmt(rc0.kisc[0]*rc0.krisc[0], 2) + ' /s²';
-
   const cfg = getSettings();
   applyFontWeight(cfg.fontWeight);
+  applyAspectRatio(cfg.aspectRatio);
 
   Plotly.react('chart_rc',
     buildTraces(RC_DEFS, d.rate_constants, d.x, cfg, true, 'rc'),
@@ -1140,13 +1239,19 @@ function setLoading(on) {
   $('calc_spinner').style.display=on?'inline-block':'none';
 }
 function showError(msg) { const e=$('alertBox'); e.textContent=msg; e.style.display=''; }
+function showPhiWarn(msg) {
+  const el = $('phi_sum_warn');
+  el.dataset.tip = msg;
+  el.style.display = 'inline-flex';
+}
 function hideError() {
-  $('alertBox').style.display='none';
+  $('alertBox').style.display = 'none';
+  $('phi_sum_warn').style.display = 'none';
   [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df'),$('inp_plqy')].forEach(el=>el.classList.remove('is-invalid'));
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-onModeChange();   // populate unit selects
+onModeChange();      // populate unit selects
 buildTraceControls();
 </script>
 </body>

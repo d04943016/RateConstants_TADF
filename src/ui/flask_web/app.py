@@ -36,7 +36,8 @@ def calculate():
     try:
         data = request.get_json()
         tau_PF, tau_DF, Phi_PF, Phi_DF = _parse_inputs(data)
-        results = _run_calculation(tau_PF, tau_DF, Phi_PF, Phi_DF)
+        n_points = max(10, int(data.get('n_points', 200)))
+        results = _run_calculation(tau_PF, tau_DF, Phi_PF, Phi_DF, n_points)
         return jsonify({'status': 'ok', 'data': results})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 400
@@ -48,10 +49,11 @@ def download():
         data = request.get_json()
         fname = data.get('filename', 'results').strip() or 'results'
         tau_PF, tau_DF, Phi_PF, Phi_DF = _parse_inputs(data)
+        n_points = max(10, int(data.get('n_points', 200)))
 
         kPF, kDF = engine.tau2k([tau_PF, tau_DF])
         PLQY = Phi_PF + Phi_DF
-        phi_Tnr_PL_Array = np.linspace(0, 1 - PLQY, 200)
+        phi_Tnr_PL_Array = np.linspace(0, 1 - PLQY, n_points)
 
         (ks_Array, ksr_Array, ksnr_Array, kisc_Array,
          kt_Array, ktr_Array, ktnr_Array, krisc_Array) = \
@@ -120,10 +122,10 @@ def _parse_inputs(data):
     return tau_PF, tau_DF, Phi_PF, Phi_DF
 
 
-def _run_calculation(tau_PF, tau_DF, Phi_PF, Phi_DF):
+def _run_calculation(tau_PF, tau_DF, Phi_PF, Phi_DF, n_points=200):
     kPF, kDF = engine.tau2k([tau_PF, tau_DF])
     PLQY = Phi_PF + Phi_DF
-    phi_Tnr_PL_Array = np.linspace(0, 1 - PLQY, 200)
+    phi_Tnr_PL_Array = np.linspace(0, 1 - PLQY, n_points)
 
     (ks_Array, ksr_Array, ksnr_Array, kisc_Array,
      kt_Array, ktr_Array, ktnr_Array, krisc_Array) = \
