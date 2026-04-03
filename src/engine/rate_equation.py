@@ -6,7 +6,7 @@
 
 import numpy as np
 
-def generate_zero_time_series(t: np.ndarray, dtype: np.dtype = np.float_) -> np.ndarray:
+def generate_zero_time_series(t: np.ndarray, dtype: np.dtype = np.float64) -> np.ndarray:
     """ 
     generate zeros time series
 
@@ -69,8 +69,8 @@ def solve_finite_difference_rate_equation(
     ks, kt = ksr+ksnr+kisc, ktr+ktnr+krisc
 
     # initial conditions
-    t_array = np.array(t_array, dtype=np.float_)
-    S1_t, T1_t = np.zeros( t_array.size, dtype=np.float_), np.zeros( t_array.size, dtype=np.float_)
+    t_array = np.array(t_array, dtype=np.float64)
+    S1_t, T1_t = np.zeros( t_array.size, dtype=np.float64), np.zeros( t_array.size, dtype=np.float64)
     S1_t[0], T1_t[0] = S10, T10
 
     # finite difference

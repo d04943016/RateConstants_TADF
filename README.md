@@ -1,8 +1,6 @@
 # RateConstants_TADF
 
-Intrinsic rate constants extraction for thermally activated delayed fluorescence (TADF) materials with two delayed components.
-
-This module calculates intrinsic rate constants between energy states: S0 (ground state), S1 (1st excited singlet), and T1 (1st excited triplet state).
+Intrinsic rate constants extraction for thermally activated delayed fluorescence (TADF) materials.
 
 <p align="center">
 <img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/process.png" width="600">
@@ -12,155 +10,131 @@ This module calculates intrinsic rate constants between energy states: S0 (groun
 
 ```
 RateConstants_TADF/
-├── src/                          # Core calculation module (new)
-├── RateConstantCalculator.py     # Core calculation module (legacy)
-├── ui/
-│   ├── flask_web/                # Flask web UI
-│   ├── fastapi/                  # FastAPI REST API
-│   └── pyqt5/                    # PyQt5 desktop GUI
-└── requirements.txt              # Combined dependencies
+├── README.md
+├── requirements.txt
+├── data/                    # Calculation output data
+└── src/
+    ├── engine/              # Core calculation engine
+    │   ├── calculator.py    # Rate constants calculator
+    │   └── rate_equation.py # Numerical rate equations
+    └── ui/
+        ├── flask_web/       # Flask web interface  (port 5000)
+        ├── fastapi/         # FastAPI REST API     (port 8000)
+        └── pyqt5/           # PyQt5 desktop GUI
 ```
 
+## Quick Start
+
+Install all dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Or install per UI (see each ui's requirements.txt).
+
 ---
 
-## User Interfaces
-
-Three independent UIs are available — each can be run separately.
-
----
+## UI Interfaces
 
 ### 1. Flask Web UI
 
-A browser-based interface built with Flask.
+Browser-based interface with interactive plots.
 
-**Install dependencies:**
 ```bash
-pip install -r ui/flask_web/requirements.txt
+pip install -r src/ui/flask_web/requirements.txt
+python src/ui/flask_web/app.py
+# Open: http://localhost:5000
 ```
 
-**Run:**
-```bash
-cd ui/flask_web
-python app.py
-```
-
-**Open browser at:** `http://localhost:5000`
-
-- Input PF/DF lifetimes (or rate constants) and quantum yields
-- View rate constants and quantum yield plots interactively
-- Download results as `.txt`
+Config: `src/ui/flask_web/config/config.json`
 
 ---
 
 ### 2. FastAPI REST API
 
-A REST API backend built with FastAPI. Suitable for programmatic access or integration with other frontends.
+REST API backend with auto-generated docs.
 
-**Install dependencies:**
 ```bash
-pip install -r ui/fastapi/requirements.txt
+pip install -r src/ui/fastapi/requirements.txt
+python src/ui/fastapi/app.py
+# API:  http://localhost:8000
+# Docs: http://localhost:8000/docs
 ```
 
-**Run:**
-```bash
-cd ui/fastapi
-python app.py
-```
+Config: `src/ui/fastapi/config/config.json`
 
-**API available at:** `http://localhost:8000`
-
-**Interactive docs at:** `http://localhost:8000/docs`
-
-**Main endpoints:**
+**Endpoints:**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/tau2k` | Convert lifetime to rate constant |
-| POST | `/k2tau` | Convert rate constant to lifetime |
-| POST | `/cal_phi_PF_DF` | Calculate phi_PF and phi_DF from PLQY |
-| POST | `/cal_determined_intrinsic_rate_constants` | Calculate determinable rate constants |
-| POST | `/cal_intrinsic_rate_constants` | Calculate all intrinsic rate constants |
-| POST | `/script` | Run full analysis script |
+| GET | `/` | Welcome message |
+| POST | `/tau2k` | Lifetime → rate constant |
+| POST | `/k2tau` | Rate constant → lifetime |
+| POST | `/cal_phi_PF_DF` | Calculate φ_PF and φ_DF |
+| POST | `/cal_determined_intrinsic_rate_constants` | Directly determinable rate constants |
+| POST | `/cal_intrinsic_rate_constants` | All intrinsic rate constants |
+| POST | `/script` | Full analysis script |
 
-**Example usage:**
+Example:
 ```bash
-python ui/fastapi/example_client.py
+python src/ui/fastapi/example_client.py
 ```
 
 ---
 
 ### 3. PyQt5 Desktop GUI
 
-A standalone desktop application built with PyQt5.
+Standalone desktop application.
 
-**Install dependencies:**
 ```bash
-pip install -r ui/pyqt5/requirements.txt
+pip install -r src/ui/pyqt5/requirements.txt
+python src/ui/pyqt5/main.py
 ```
 
-**Run:**
-```bash
-cd ui/pyqt5
-python GUI_PyQt5_main.py
-```
-
-**Features:**
-- Select input mode: lifetime or rate constant
-- Input PF/DF values and quantum yields (or prefactors + PLQY)
-- Choose save path and filename
-- View summarized results in terminal
-- Export rate constants and quantum yield plots
-
-<p align="center">
-<img src="https://github.com/d04943016/RateConstants_TADF/blob/main/Graph/Panel.png" width="1200">
-</p>
+Config: `src/ui/pyqt5/config/config.json`
 
 ---
 
-## Core Module
+## Core Engine
 
-### Symbols
+### Usage
+
+```python
+import sys
+sys.path.insert(0, '/path/to/RateConstants_TADF')
+from src.engine import calculator as engine
+
+# Convert lifetime to rate constant
+kPF, kDF = engine.tau2k([15e-9, 2.9e-6])
+
+# Calculate intrinsic rate constants
+import numpy as np
+phi_Tnr_PL = np.linspace(0, 0.18, 200)
+ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc = engine.cal_intrinsic_rate_constants(
+    kPF, kDF, phi_PF=0.70, phi_DF=0.12, phi_Tnr_PL=phi_Tnr_PL
+)
+
+# Full script with plots and file output
+engine.script(tau_PF=15e-9, tau_DF=2.9e-6, phi_PF=0.70, phi_DF=0.12,
+              fpath='data/output', fname='DPAC-TRZ')
+```
+
+### Key Symbols
 
 | Symbol | Description |
 |--------|-------------|
-| PF | Prompt fluorescence |
-| DF | Delayed fluorescence |
-| tau | Exciton lifetime |
+| PF / DF | Prompt / Delayed fluorescence |
+| τ (tau) | Exciton lifetime |
 | k | Rate constant |
+| ksr | Singlet radiative rate constant |
+| ksnr | Singlet non-radiative rate constant |
+| kisc | Intersystem crossing (S1→T1) |
+| krisc | Reverse ISC (T1→S1) |
 | PLQY | Photoluminescence quantum yield |
 
-### Key functions (`RateConstantCalculator`)
+## Output
 
-```python
-import RateConstantCalculator as RCC
-
-# Convert lifetime <-> rate constant
-RCC.tau2k(tau)
-RCC.k2tau(k)
-
-# Calculate phi_PF and phi_DF
-RCC.phi_PF_DF(PLQY, tauPF, tauDF, B_PF, B_DF)
-
-# Calculate intrinsic rate constants
-RCC.IntrinsicRateConstants(kPF, kDF, phi_PF, phi_DF, phi_Tnr_PL)
-
-# Full analysis scripts
-RCC.script_for_100_PLQY(tau_PF, tau_DF, phi_PF, phi_DF, name='')
-RCC.script(tau_PF, tau_DF, phi_PF, phi_DF, fpath='', fname='')
-```
-
-### Example
-
-```python
-import numpy as np
-import RateConstantCalculator as RCC
-
-# DPAC-TRZ
-RCC.script(tau_PF=15e-9, tau_DF=2.9e-6, phi_PF=0.70, phi_DF=0.12,
-           fname='DPAC-TRZ', fpath='./data')
-```
-
----
+Results are saved to `data/output/` by default (configurable per UI in `config/config.json`).
 
 ## References
 

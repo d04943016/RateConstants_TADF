@@ -1,16 +1,23 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
+import json
 import numpy as np
 import os
 import sys
 
-# Add project root to path so src/ can be imported
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from src import rate_constants_calculator as rcc
+from src.engine import calculator as engine
+
+_CFG_PATH = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
+with open(_CFG_PATH) as _f:
+    _CFG = json.load(_f)
+
+OUTPUT_DIR = os.path.join(ROOT, _CFG.get('output_dir', 'data/output'))
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 app = FastAPI(
     title="TADF Rate Constants Calculator API",
@@ -67,7 +74,7 @@ def read_root():
 def convert_tau_to_k(input_data: LifetimeInput):
     """Convert lifetime to rate constant"""
     try:
-        return {"k": rcc.tau2k(input_data.tau).tolist()}
+        return {"k": engine.tau2k(input_data.tau).tolist()}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -75,7 +82,7 @@ def convert_tau_to_k(input_data: LifetimeInput):
 def convert_k_to_tau(input_data: RateConstantInput):
     """Convert rate constant to lifetime"""
     try:
-        return {"tau": rcc.k2tau(input_data.k).tolist()}
+        return {"tau": engine.k2tau(input_data.k).tolist()}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -83,7 +90,7 @@ def convert_k_to_tau(input_data: RateConstantInput):
 def calculate_phi_pf_df(input_data: PhiPFDFInput):
     """Calculate the absolute ratio of prompt and delayed fluorescence"""
     try:
-        phi_PF, phi_DF = rcc.cal_phi_PF_DF(
+        phi_PF, phi_DF = engine.cal_phi_PF_DF(
             input_data.PLQY, input_data.tauPF, input_data.tauDF,
             input_data.B_PF, input_data.B_DF
         )
@@ -95,7 +102,7 @@ def calculate_phi_pf_df(input_data: PhiPFDFInput):
 def calculate_determined_rate_constants(input_data: DeterminedRateConstantsInput):
     """Calculate rate constants determinable directly from experimental data"""
     try:
-        ksr, ks, kt, kisckrisc = rcc.cal_determined_intrinsic_rate_constants(
+        ksr, ks, kt, kisckrisc = engine.cal_determined_intrinsic_rate_constants(
             input_data.kPF, input_data.kDF, input_data.phi_PF, input_data.phi_DF
         )
         return {"ksr": float(ksr), "ks": float(ks), "kt": float(kt), "kisckrisc": float(kisckrisc)}
@@ -106,7 +113,7 @@ def calculate_determined_rate_constants(input_data: DeterminedRateConstantsInput
 def calculate_intrinsic_rate_constants(input_data: IntrinsicRateConstantsInput):
     """Calculate all intrinsic rate constants"""
     try:
-        ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc = rcc.cal_intrinsic_rate_constants(
+        ks, ksr, ksnr, kisc, kt, ktr, ktnr, krisc = engine.cal_intrinsic_rate_constants(
             input_data.kPF, input_data.kDF, input_data.phi_PF,
             input_data.phi_DF, input_data.phi_Tnr_PL
         )
@@ -122,10 +129,10 @@ def run_script(input_data: ScriptInput):
     """Run the rate constants calculator script"""
     try:
         fname = input_data.fname if input_data.fname else ""
-        result = rcc.script(
+        result = engine.script(
             input_data.tau_PF, input_data.tau_DF,
             input_data.phi_PF, input_data.phi_DF,
-            fpath="", fname=fname
+            fpath=OUTPUT_DIR, fname=fname
         )
         return {k: float(v) if hasattr(v, "item") else v for k, v in result.items()}
     except Exception as e:
@@ -134,4 +141,4 @@ def run_script(input_data: ScriptInput):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=_CFG.get('host', '0.0.0.0'), port=_CFG.get('port', 8000))

@@ -166,21 +166,21 @@ def cal_intrinsic_rate_constants(kPF:float, kDF:float, phi_PF:float, phi_DF:floa
     """
 
     # convert to numpy array
-    phi_Tnr_PL_Array = np.asarray( phi_Tnr_PL, dtype=np.float_ )
+    phi_Tnr_PL_Array = np.asarray( phi_Tnr_PL, dtype=np.float64 )
 
     # calculate the determined rate constants
     ksr, ks, kt, kisckrisc = cal_determined_intrinsic_rate_constants(kPF, kDF, phi_PF, phi_DF)
     
-    ksr = ksr * np.ones( phi_Tnr_PL_Array.size, dtype=np.float_ )
-    ks  = ks  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float_ )
-    kt  = kt  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float_ )
+    ksr = ksr * np.ones( phi_Tnr_PL_Array.size, dtype=np.float64 )
+    ks  = ks  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float64 )
+    kt  = kt  * np.ones( phi_Tnr_PL_Array.size, dtype=np.float64 )
 
     # calculate the non-determined rate constants
     kisc = (kisckrisc + phi_Tnr_PL_Array*kPF*kDF)/kt
     krisc = kisckrisc/kisc
     ksnr = ks - kisc - ksr
 
-    ktr = np.zeros( phi_Tnr_PL_Array.size, dtype=np.float_ )
+    ktr = np.zeros( phi_Tnr_PL_Array.size, dtype=np.float64 )
     ktnr = kt - krisc - ktr
 
     # return the rate constants
@@ -460,9 +460,9 @@ def cal_pulse_response(t:np.ndarray, ksr:float, ksnr:float, kisc:float, ktr:floa
 
     # eigen vector
     V_PF = np.array( [ (ks-kDF) * S10 -   krisc  * T10,
-                        -kisc   * S10 + (kt-kDF) * T10] , dtype=np.float_ )/(kPF-kDF)
+                        -kisc   * S10 + (kt-kDF) * T10] , dtype=np.float64 )/(kPF-kDF)
     V_DF = np.array( [ (kPF-ks) * S10 +   krisc  * T10,
-                         kisc   * S10 + (kPF-kt) * T10] , dtype=np.float_ )/(kPF-kDF)
+                         kisc   * S10 + (kPF-kt) * T10] , dtype=np.float64 )/(kPF-kDF)
     
     # time series
     S1_t = V_PF[0] * np.exp( -kPF*t ) + V_DF[0] * np.exp( -kDF*t )
