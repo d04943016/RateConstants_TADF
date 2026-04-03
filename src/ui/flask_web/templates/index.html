@@ -812,17 +812,24 @@ $('theory_overlay').addEventListener('click', e => { if (e.target === $('theory_
 
 // ── Panel collapse ────────────────────────────────────────────────────────────
 let leftOpen = true, rightOpen = true;
+function smoothResize(ms) {
+  const end = performance.now() + ms;
+  (function frame() {
+    window.dispatchEvent(new Event('resize'));
+    if (performance.now() < end) requestAnimationFrame(frame);
+  })();
+}
 function toggleLeft() {
   leftOpen = !leftOpen;
   $('left_panel').classList.toggle('collapsed', !leftOpen);
   $('left_toggle').classList.toggle('active', !leftOpen);
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 250);
+  smoothResize(260);
 }
 function toggleRight() {
   rightOpen = !rightOpen;
   $('right_panel').classList.toggle('collapsed', !rightOpen);
   $('right_toggle').classList.toggle('active', !rightOpen);
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 250);
+  smoothResize(260);
 }
 
 // ── Accordion ─────────────────────────────────────────────────────────────────
@@ -1031,8 +1038,8 @@ function getTraceOverride(prefix, i) {
 function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
   const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
   const openFill = pubMode ? '#ffffff' : (currentTheme === 'dark' ? '#1a1d27' : '#ffffff');
-  // Size array: markerSize at every N-th point, 0 elsewhere (hides without affecting legend)
-  const sparseSize = Array.from({length: xArr.length}, (_, k) => k % markerEvery === 0 ? markerSize : 0);
+  // maxdisplayed limits markers in chart while leaving the legend marker unaffected
+  const nShow = Math.max(2, Math.ceil(xArr.length / markerEvery));
 
   return defs.map((def, i) => {
     const ov       = getTraceOverride(prefix, i);
@@ -1043,7 +1050,6 @@ function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
     const baseSym  = isOpen ? sym.replace('-open', '') : sym;
     const fillC    = isOpen ? openFill : color;
     const edgeW    = isOpen ? Math.max(1.5, lineWidth * 0.7) : 0;
-    // Hover: show labeled x (Φ_Tnr) and y (value) on the same box
     const htpl = isLog
       ? `Φ<sub>Tnr</sub> = %{x:.2f}%<br><b>${def.name}</b> = %{y:.3e} s⁻¹<extra></extra>`
       : `Φ<sub>Tnr</sub> = %{x:.2f}%<br><b>${def.name}</b> = %{y:.2f}%<extra></extra>`;
@@ -1054,10 +1060,10 @@ function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
       hovertemplate: htpl,
       line: { color, width: lineWidth, dash: def.dash },
       marker: {
-        symbol: baseSym,
-        size: sparseSize,   // size=0 hides non-sparse; legend uses size[0] = markerSize
+        symbol: baseSym, size: markerSize,
         color: fillC,
         line: { width: edgeW, color },
+        maxdisplayed: nShow,  // sparse markers in chart; legend marker unaffected
       },
     };
   });
