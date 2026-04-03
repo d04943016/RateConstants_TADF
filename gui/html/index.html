@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TADF Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-with-unit input {
+            flex: 1;
+        }
+        .unit {
+            min-width: 40px;
+            color: #666;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-group">
+            <select id="lifetimeType">
+                <option value="lifetime">Lifetime (tau)</option>
+                <option value="rate">Rate Constant (k)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Prompt Fluorescence (PF)</label>
+            <div class="input-with-unit">
+                <input type="number" id="pf" value="15">
+                <span class="unit">ns</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Delayed Fluorescence (DF)</label>
+            <div class="input-with-unit">
+                <input type="number" id="df" value="2.9">
+                <span class="unit">μs</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <select id="qyType">
+                <option value="qy">Quantum Yield (Q.Y.)</option>
+                <option value="b">B (exponent prefactor)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Prompt Fluorescence (PF)</label>
+            <div class="input-with-unit">
+                <input type="number" id="pfPercentage" value="70">
+                <span class="unit">%</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Delayed Fluorescence (DF)</label>
+            <div class="input-with-unit">
+                <input type="number" id="dfPercentage" value="12">
+                <span class="unit">%</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>PLQY</label>
+            <div class="input-with-unit">
+                <input type="number" id="plqy" value="100">
+                <span class="unit">%</span>
+            </div>
+        </div>
+
+        <button onclick="calculate()">Calculate</button>
+    </div>
+
+    <script>
+        function calculate() {
+            // Get all input values
+            const lifetimeType = document.getElementById('lifetimeType').value;
+            const pf = parseFloat(document.getElementById('pf').value);
+            const df = parseFloat(document.getElementById('df').value);
+            const qyType = document.getElementById('qyType').value;
+            const pfPercentage = parseFloat(document.getElementById('pfPercentage').value);
+            const dfPercentage = parseFloat(document.getElementById('dfPercentage').value);
+            const plqy = parseFloat(document.getElementById('plqy').value);
+
+            // Here you can add your calculation logic
+            console.log('Calculating with values:', {
+                lifetimeType,
+                pf,
+                df,
+                qyType,
+                pfPercentage,
+                dfPercentage,
+                plqy
+            });
+
+            // Add your calculation logic here
+            // You can display results in an alert or add a results section to the HTML
+            alert('Calculation function called! Implementation pending.');
+        }
+    </script>
+</body>
+</html> 

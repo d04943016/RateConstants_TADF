@@ -1,3 +1,8 @@
 flask>=3.0
+fastapi>=0.103.0
+uvicorn>=0.23.0
+pydantic>=2.3.0
 numpy>=1.24
 matplotlib>=3.5
+PyQt5>=5.15
+python-multipart>=0.0.6
