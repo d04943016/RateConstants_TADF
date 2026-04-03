@@ -60,35 +60,42 @@
     .hdr-btn:hover, .hdr-btn.active { border-color: var(--accent); color: var(--accent); }
 
     /* ── Three-column layout ────────────────────────────── */
-    .layout { display: flex; height: calc(100vh - 54px); overflow: hidden; }
+    .layout {
+      display: flex; height: calc(100vh - 54px); overflow: hidden;
+      position: relative; /* for sidebar-btn absolute positioning */
+    }
 
-    /* ── Side panels (flexbox, toggle strip always visible) */
+    /* ── Sidebar panels ──────────────────────────────────── */
     .col-panel {
-      flex-shrink: 0; background: var(--bg-card);
-      display: flex; transition: width 0.22s ease; overflow: hidden;
+      flex-shrink: 0; background: var(--bg-card); overflow: hidden;
+      transition: width 0.22s ease;
     }
-    .col-panel.left  { width: 282px; border-right: 1px solid var(--border); flex-direction: row; }
-    .col-panel.right { width: 304px; border-left:  1px solid var(--border); flex-direction: row-reverse; }
-    .col-panel.left.collapsed  { width: 26px; }
-    .col-panel.right.collapsed { width: 26px; }
+    .col-panel.left  { width: 282px; border-right: 1px solid var(--border); }
+    .col-panel.right { width: 304px; border-left:  1px solid var(--border); }
+    .col-panel.collapsed { width: 0 !important; }
 
-    /* Toggle strip (always 26px, lives at the inner edge) */
-    .panel-toggle {
-      width: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; user-select: none;
-      background: var(--bg-input); border-left: 1px solid var(--border);
-      color: var(--text-muted); font-size: 0.68rem; font-weight: 700;
-      transition: background 0.15s, color 0.15s;
-    }
-    .col-panel.left  .panel-toggle { border-left: none; border-right: 1px solid var(--border); order: 2; }
-    .col-panel.right .panel-toggle { border-right: none; border-left: 1px solid var(--border); order: 2; }
-    .panel-toggle:hover { background: var(--accent); color: #fff; }
-
-    /* Panel inner scrollable content */
+    /* Panel content (scrollable area) */
     .panel-content {
-      flex: 1; min-width: 0; overflow-y: auto; overflow-x: hidden;
+      width: 282px; /* fixed so content doesn't reflow on collapse */
+      height: 100%; overflow-y: auto; overflow-x: hidden;
       padding: 0.8rem 0.9rem 2.5rem;
     }
+    .col-panel.right .panel-content { width: 304px; }
+
+    /* ── Sidebar toggle buttons (positioned in layout) ──── */
+    .sidebar-btn {
+      position: absolute; top: 28px; z-index: 200;
+      width: 20px; height: 44px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none;
+      box-shadow: 2px 0 8px var(--shadow);
+      transition: left 0.22s ease, right 0.22s ease, background 0.15s, color 0.15s;
+    }
+    .sidebar-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #left_toggle  { left: 282px; border-radius: 0 6px 6px 0; border-left: none; }
+    #right_toggle { right: 304px; border-radius: 6px 0 0 6px; border-right: none; }
 
     /* ── Middle panel ───────────────────────────────────── */
     .mid-panel {
@@ -130,7 +137,7 @@
       cursor: default; user-select: none; flex-shrink: 0; vertical-align: middle;
     }
 
-    /* ── Global tooltip (position:fixed — never clipped) ── */
+    /* ── Global tooltip (position:fixed, never clipped) ─── */
     #g_tip {
       display: none; position: fixed; z-index: 9999;
       background: var(--bg-card); border: 1px solid var(--border);
@@ -163,16 +170,22 @@
     .btn-download:hover { background: rgba(79,142,247,0.1); }
     .spinner-border { width: 1rem; height: 1rem; border-width: 2px; }
 
-    /* ── Summary bar ─────────────────────────────────────── */
-    .summary-bar {
+    /* ── Summary bars ────────────────────────────────────── */
+    .result-bar {
       background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.6rem 0.95rem; margin-bottom: 0.6rem;
+      border-radius: 8px; padding: 0.55rem 0.9rem; margin-bottom: 0.5rem;
       display: none;
     }
-    .kv-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.3rem 0.6rem; }
+    .result-bar-title {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.35rem;
+    }
+    .kv-grid { display: grid; gap: 0.25rem 0.5rem; }
+    .kv-grid-5 { grid-template-columns: repeat(5, 1fr); }
+    .kv-grid-4 { grid-template-columns: repeat(4, 1fr); }
     .kv-item { display: flex; flex-direction: column; }
-    .kv-key { font-size: 0.8rem; color: var(--text-muted); }
-    .kv-val { font-size: 0.9rem; font-weight: 600; color: var(--text-main); font-family: monospace; }
+    .kv-key { font-size: 0.78rem; color: var(--text-muted); }
+    .kv-val { font-size: 0.88rem; font-weight: 600; color: var(--text-main); font-family: monospace; }
 
     /* ── Charts ──────────────────────────────────────────── */
     .chart-wrapper {
@@ -210,23 +223,22 @@
     .summary-table tbody tr:hover td { background: rgba(79,142,247,0.06) !important; color: var(--text-main); }
     .summary-table td:first-child { font-family: inherit; color: var(--text-muted); font-size: 0.79rem; }
 
-    /* ── Right panel: numeric control grid ──────────────── */
+    /* ── Right panel: numeric controls ──────────────────── */
     .ctrl-section-label {
       font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.08em; color: var(--text-muted);
-      margin: 0.55rem 0 0.3rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border);
+      margin: 0.6rem 0 0.3rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border);
     }
     .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 0.5rem; margin-bottom: 0.1rem; }
-    .ctrl-item label {
-      font-size: 0.82rem; color: var(--text-label); display: block; margin-bottom: 0.12rem;
-    }
+    .ctrl-item label { font-size: 0.82rem; color: var(--text-label); display: block; margin-bottom: 0.12rem; }
     .ni-wrap { display: flex; align-items: center; gap: 0.3rem; }
-    .ni-wrap input[type=number] {
-      width: 68px; background: var(--bg-input); border: 1px solid var(--border);
+    .ni-wrap input[type=number], .ni-wrap select {
+      width: 72px; background: var(--bg-input); border: 1px solid var(--border);
       color: var(--text-main); font-size: 0.88rem; border-radius: 4px;
-      padding: 0.22rem 0.45rem; text-align: right;
+      padding: 0.22rem 0.45rem;
     }
-    .ni-wrap input[type=number]:focus {
+    .ni-wrap input[type=number] { text-align: right; }
+    .ni-wrap input[type=number]:focus, .ni-wrap select:focus {
       outline: none; border-color: var(--accent);
       box-shadow: 0 0 0 2px rgba(79,142,247,0.2);
     }
@@ -236,16 +248,13 @@
     .range-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 0.5rem; margin-bottom: 0.35rem; }
     .range-grid label { font-size: 0.8rem; color: var(--text-label); }
 
-    /* Publication / export row */
+    /* Publication / export */
     .pub-check { font-size: 0.84rem; color: var(--text-label); }
     .pub-check input { accent-color: var(--accent); }
 
-    /* ── Alert ───────────────────────────────────────────── */
-    #alertBox { display: none; font-size: 0.84rem; }
-
     /* ── Trace style controls ────────────────────────────── */
     .trace-ctrl-row {
-      display: flex; align-items: center; gap: 0.38rem; margin-bottom: 0.28rem; min-width: 0;
+      display: flex; align-items: center; gap: 0.38rem; margin-bottom: 0.3rem; min-width: 0;
     }
     .tc-vis { accent-color: var(--accent); flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; }
     .tc-color {
@@ -256,10 +265,10 @@
       flex: 1; min-width: 0; background: var(--bg-input); border: 1px solid var(--border);
       color: var(--text-main); font-size: 0.75rem; border-radius: 4px; padding: 0.08rem 0.2rem;
     }
-    .tc-name {
-      color: var(--text-label); font-size: 0.8rem; white-space: nowrap;
-      min-width: 48px; font-family: serif;
-    }
+    .tc-name { color: var(--text-label); font-size: 0.8rem; white-space: nowrap; min-width: 46px; font-family: serif; }
+
+    /* ── Alert ───────────────────────────────────────────── */
+    #alertBox { display: none; font-size: 0.84rem; }
 
     /* ── Accordion (left panel) ──────────────────────────── */
     .acc-header {
@@ -286,9 +295,7 @@
       color: var(--text-muted); cursor: pointer; line-height: 1;
     }
     .theory-close:hover { color: var(--text-main); }
-    .theory-modal > h3 {
-      font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main);
-    }
+    .theory-modal > h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); }
     .theory-body { font-size: 0.92rem; color: var(--text-label); line-height: 1.72; }
     .theory-body h4 {
       font-size: 0.95rem; font-weight: 700; color: var(--accent);
@@ -325,22 +332,22 @@
 
 <!-- ── Theory Modal ── -->
 <div class="theory-overlay" id="theory_overlay">
-  <div class="theory-modal" id="theory_modal_box">
+  <div class="theory-modal">
     <button class="theory-close" onclick="closeTheory()">✕</button>
     <h3>📖 Theoretical Background</h3>
     <div class="theory-body">
 
       <h4>1. Three-Level Kinetic Model</h4>
-      <p>A TADF emitter has three states: S₀ (ground), S₁ (singlet), T₁ (triplet). Excitons populate S₁ or T₁ upon excitation (fraction α to S₁). From S₁, emission (k<sub>sr</sub>), non-radiative decay (k<sub>snr</sub>), or ISC (k<sub>ISC</sub>) can occur. From T₁, thermally activated RISC (k<sub>RISC</sub>) or non-radiative decay (k<sub>Tnr</sub>).</p>
+      <p>A TADF emitter has three states: S₀ (ground), S₁ (singlet), T₁ (triplet). From S₁: radiative emission (k<sub>sr</sub>), non-radiative decay (k<sub>snr</sub>), or ISC (k<sub>ISC</sub>). From T₁: thermally activated RISC (k<sub>RISC</sub>) or non-radiative decay (k<sub>Tnr</sub>).</p>
       <div class="eq-block">
         dS₁/dt = −k<sub>s</sub>·S₁ + k<sub>RISC</sub>·T₁ + αG<br>
         dT₁/dt = k<sub>ISC</sub>·S₁ − k<sub>t</sub>·T₁ + (1−α)G<br>
         <span style="font-size:0.82rem;color:var(--text-muted);">k<sub>s</sub> = k<sub>sr</sub>+k<sub>snr</sub>+k<sub>ISC</sub> &nbsp; k<sub>t</sub> = k<sub>Tnr</sub>+k<sub>RISC</sub></span>
       </div>
-      <p>The PL decay is biexponential: I(t) = B<sub>PF</sub>·e<sup>−t/τ<sub>PF</sub></sup> + B<sub>DF</sub>·e<sup>−t/τ<sub>DF</sub></sup>, arising from the two eigenvalues of the coupled system:</p>
+      <p>PL decay: I(t) = B<sub>PF</sub>·e<sup>−t/τ<sub>PF</sub></sup> + B<sub>DF</sub>·e<sup>−t/τ<sub>DF</sub></sup>. The two observed decay times arise from eigenvalues of the coupled S₁/T₁ system:</p>
       <div class="eq-block">
-        k<sub>PF</sub> = (k<sub>s</sub>+k<sub>t</sub>+Δ)/2 &nbsp; (fast, prompt fluorescence)<br>
-        k<sub>DF</sub> = (k<sub>s</sub>+k<sub>t</sub>−Δ)/2 &nbsp; (slow, delayed fluorescence)<br>
+        k<sub>PF</sub> = 1/τ<sub>PF</sub> = (k<sub>s</sub>+k<sub>t</sub>+Δ)/2<br>
+        k<sub>DF</sub> = 1/τ<sub>DF</sub> = (k<sub>s</sub>+k<sub>t</sub>−Δ)/2<br>
         Δ = √[(k<sub>s</sub>−k<sub>t</sub>)² + 4·k<sub>ISC</sub>·k<sub>RISC</sub>]
       </div>
 
@@ -349,14 +356,15 @@
         <thead><tr><th>Symbol</th><th>Physical meaning</th></tr></thead>
         <tbody>
           <tr><td>k<sub>sr</sub></td><td>Radiative decay S₁→S₀; governs prompt fluorescence yield</td></tr>
-          <tr><td>k<sub>snr</sub></td><td>Non-radiative S₁ decay (internal conversion, IC)</td></tr>
+          <tr><td>k<sub>snr</sub></td><td>Non-radiative S₁ decay (internal conversion)</td></tr>
           <tr><td>k<sub>ISC</sub></td><td>Intersystem crossing S₁→T₁; driven by spin-orbit coupling</td></tr>
           <tr><td>k<sub>Tnr</sub></td><td>Non-radiative T₁ decay; main efficiency loss pathway</td></tr>
           <tr><td>k<sub>RISC</sub></td><td>Reverse ISC T₁→S₁; thermally activated — the TADF key step</td></tr>
         </tbody>
       </table>
 
-      <h4>3. Directly Determined from Experiment</h4>
+      <h4>3. Directly Determined Constants</h4>
+      <p>Four quantities are uniquely determined from τ<sub>PF</sub>, τ<sub>DF</sub>, Φ<sub>PF</sub>, Φ<sub>DF</sub> alone:</p>
       <div class="eq-block">
         k<sub>sr</sub> = k<sub>PF</sub>·Φ<sub>PF</sub> + k<sub>DF</sub>·Φ<sub>DF</sub><br>
         k<sub>s</sub>  = (k<sub>PF</sub>²·Φ<sub>PF</sub> + k<sub>DF</sub>²·Φ<sub>DF</sub>) / k<sub>sr</sub><br>
@@ -364,8 +372,8 @@
         k<sub>ISC</sub>·k<sub>RISC</sub> = Φ<sub>PF</sub>·Φ<sub>DF</sub>·k<sub>PF</sub>·k<sub>DF</sub>·(k<sub>PF</sub>−k<sub>DF</sub>)² / k<sub>sr</sub>²
       </div>
 
-      <h4>4. Φ<sub>Tnr</sub> Sweep (Underdetermined Parameter)</h4>
-      <p>k<sub>ISC</sub> and k<sub>RISC</sub> individually require Φ<sub>Tnr</sub><sup>PL</sup> (non-radiative triplet loss fraction) as an additional constraint. The calculator sweeps Φ<sub>Tnr</sub> from 0 to (1 − PLQY):</p>
+      <h4>4. Φ<sub>Tnr</sub> Sweep</h4>
+      <p>k<sub>ISC</sub> and k<sub>RISC</sub> individually require Φ<sub>Tnr</sub><sup>PL</sup> (non-radiative triplet loss fraction). The calculator sweeps Φ<sub>Tnr</sub> from 0 to (1−PLQY):</p>
       <div class="eq-block">
         k<sub>ISC</sub> = (k<sub>ISC</sub>·k<sub>RISC</sub> + Φ<sub>Tnr</sub>·k<sub>PF</sub>·k<sub>DF</sub>) / k<sub>t</sub><br>
         k<sub>RISC</sub> = (k<sub>ISC</sub>·k<sub>RISC</sub>) / k<sub>ISC</sub><br>
@@ -374,32 +382,32 @@
 
       <h4>5. Quantum Efficiencies</h4>
       <div class="eq-block">
-        Φ<sub>sr</sub>   = k<sub>sr</sub>/k<sub>s</sub> &nbsp; Φ<sub>ISC</sub>  = k<sub>ISC</sub>/k<sub>s</sub><br>
+        Φ<sub>sr</sub> = k<sub>sr</sub>/k<sub>s</sub> &nbsp; Φ<sub>ISC</sub> = k<sub>ISC</sub>/k<sub>s</sub><br>
         Φ<sub>RISC</sub> = k<sub>RISC</sub>/k<sub>t</sub> &nbsp; Φ<sub>Tnr</sub> = k<sub>Tnr</sub>/k<sub>t</sub><br>
         PLQY = Φ<sub>sr</sub> / (1 − Φ<sub>ISC</sub>·Φ<sub>RISC</sub>)
       </div>
 
       <h4>6. Worked Example</h4>
       <div class="example-box">
-        <strong>Input:</strong> τ<sub>PF</sub> = 15 ns, τ<sub>DF</sub> = 2.9 µs, Φ<sub>PF</sub> = 70%, Φ<sub>DF</sub> = 12%<br>
-        k<sub>PF</sub> = 6.67×10⁷ s⁻¹, &nbsp; k<sub>DF</sub> = 3.45×10⁵ s⁻¹<br><br>
+        <strong>Input:</strong> τ<sub>PF</sub>=15 ns, τ<sub>DF</sub>=2.9 µs, Φ<sub>PF</sub>=70%, Φ<sub>DF</sub>=12%<br>
+        k<sub>PF</sub>=6.67×10⁷ s⁻¹, k<sub>DF</sub>=3.45×10⁵ s⁻¹<br><br>
         <strong>Directly determined:</strong><br>
-        k<sub>sr</sub> ≈ 4.67×10⁷ s⁻¹, &nbsp; k<sub>s</sub> ≈ 6.66×10⁷ s⁻¹, &nbsp; k<sub>t</sub> ≈ 4.04×10⁵ s⁻¹<br><br>
-        <strong>At Φ<sub>Tnr</sub> = 0:</strong> &nbsp; k<sub>ISC</sub> ≈ 9.65×10⁶, k<sub>RISC</sub> ≈ 4.04×10⁵ s⁻¹, k<sub>Tnr</sub> = 0<br>
-        <strong>At Φ<sub>Tnr</sub> = 18%:</strong> k<sub>RISC</sub> decreases, k<sub>Tnr</sub> increases — set by PLQY constraint
+        k<sub>sr</sub>≈4.67×10⁷, k<sub>s</sub>≈6.66×10⁷, k<sub>t</sub>≈4.04×10⁵ s⁻¹<br>
+        k<sub>ISC</sub>·k<sub>RISC</sub>≈3.91×10¹² s⁻²<br><br>
+        <strong>At Φ<sub>Tnr</sub>=0:</strong> k<sub>ISC</sub>≈9.65×10⁶, k<sub>RISC</sub>≈4.04×10⁵ s⁻¹<br>
+        <strong>At Φ<sub>Tnr</sub>=18%:</strong> k<sub>RISC</sub> decreases, k<sub>Tnr</sub> increases
       </div>
 
       <h4>References</h4>
       <ol class="ref-list">
-        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2015 — DPAC TADF; full kinetic rate constant derivation</li>
-        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2016 — CN-pyridine/pyrimidine acceptors; SI derivation</li>
+        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2015 — DPAC TADF; full rate constant derivation</li>
+        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2016 — CN-pyridine/pyrimidine; SI derivation</li>
         <li>Wu et al., <em>ACS Photonics</em> 2016 — Spiroacridine-triazine; 37% EQE</li>
         <li>Wu et al., <em>Adv. Funct. Mater.</em> 2017 — Naphthalimide-acridine; ~30% EQE</li>
       </ol>
-
-    </div><!-- /theory-body -->
-  </div><!-- /theory-modal -->
-</div><!-- /theory-overlay -->
+    </div>
+  </div>
+</div>
 
 <!-- ── Header ── -->
 <div class="app-header">
@@ -414,11 +422,11 @@
 </div>
 
 <!-- ── Three-column layout ── -->
-<div class="layout">
+<div class="layout" id="layout">
 
   <!-- ══ LEFT PANEL: Physics parameters ══ -->
   <div class="col-panel left" id="left_panel">
-    <div class="panel-content" id="left_content">
+    <div class="panel-content">
 
       <!-- Decay Parameters -->
       <div class="mb-3">
@@ -434,7 +442,8 @@
 
           <label class="form-label" id="lbl_pf">
             Prompt Fluorescence (PF)
-            <span class="tip" data-tip="τ_PF — Fast decay from S₁→S₀ (direct fluorescence, ~ns). The short-lived component of biexponential PL decay." id="tip_pf">i</span>
+            <span class="tip" id="tip_pf"
+              data-tip="τ_PF — Measured fast decay component from time-resolved PL (TCSPC). Observed lifetime of the prompt emission channel (~ns). This is an experimental observable, not an intrinsic rate constant.">i</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_pf" class="form-control" value="15" step="any" min="0" />
@@ -443,7 +452,8 @@
 
           <label class="form-label" id="lbl_df">
             Delayed Fluorescence (DF)
-            <span class="tip" data-tip="τ_DF — Slow TADF decay via T₁→S₁→S₀ (reverse ISC, ~µs). The long-lived component from thermally activated triplet harvesting." id="tip_df">i</span>
+            <span class="tip" id="tip_df"
+              data-tip="τ_DF — Measured slow decay component from time-resolved PL. Observed lifetime of the TADF emission channel (~µs). This is an experimental observable arising from the thermally activated T₁↔S₁ equilibrium.">i</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_df" class="form-control" value="2.9" step="any" min="0" />
@@ -464,18 +474,20 @@
             <option value="1">B (exponent prefactor)</option>
           </select>
 
-          <label class="form-label" id="lbl_phi_pf">
+          <label class="form-label">
             <span id="lbl_sym_pf">Φ<sub>PF</sub></span>
-            <span class="tip" id="tip_phi_pf" data-tip="Φ_PF — Fraction of PLQY from prompt fluorescence (S₁ direct emission).">i</span>
+            <span class="tip" id="tip_phi_pf"
+              data-tip="Φ_PF — Measured fraction of total PLQY from the prompt emission component. Obtained by integrating the B_PF·exp(−t/τ_PF) component of the biexponential PL decay curve.">i</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_phi_pf" class="form-control" value="70" step="any" min="0" />
             <span class="input-group-text" id="unit_phi_pf">%</span>
           </div>
 
-          <label class="form-label" id="lbl_phi_df">
+          <label class="form-label">
             <span id="lbl_sym_df">Φ<sub>DF</sub></span>
-            <span class="tip" id="tip_phi_df" data-tip="Φ_DF — Fraction of PLQY from delayed fluorescence (harvested via RISC). Reflects triplet-to-singlet upconversion efficiency.">i</span>
+            <span class="tip" id="tip_phi_df"
+              data-tip="Φ_DF — Measured fraction of total PLQY from the delayed emission component. Reflects triplet harvesting efficiency via RISC. Obtained from the B_DF·exp(−t/τ_DF) component.">i</span>
           </label>
           <div class="input-group input-group-sm mb-2">
             <input type="number" id="inp_phi_df" class="form-control" value="12" step="any" min="0" />
@@ -495,7 +507,11 @@
         </div>
       </div>
 
-      <!-- Actions -->
+      <!-- Filename + Actions -->
+      <div class="mb-2">
+        <label style="font-size:0.82rem;color:var(--text-label);">Output Filename</label>
+        <input type="text" id="inp_fname" class="form-control form-control-sm mb-2" value="results" placeholder="results">
+      </div>
       <button id="btn_calc" class="btn-calculate mb-2">
         <span id="calc_spinner" class="spinner-border me-2" role="status" style="display:none;"></span>
         Calculate
@@ -504,34 +520,46 @@
       <div id="alertBox" class="alert alert-danger mt-2 py-2 px-3"></div>
 
     </div><!-- /panel-content -->
-    <div class="panel-toggle" id="left_toggle" onclick="toggleLeft()">◀</div>
   </div><!-- /left_panel -->
+
+  <!-- ── Sidebar toggle buttons (inside layout, position:absolute) ── -->
+  <button class="sidebar-btn" id="left_toggle" onclick="toggleLeft()">‹</button>
+  <button class="sidebar-btn" id="right_toggle" onclick="toggleRight()">›</button>
 
   <!-- ══ MIDDLE PANEL: Charts ══ -->
   <div class="mid-panel" id="mid_panel">
 
-    <!-- Summary bar -->
-    <div class="summary-bar" id="summary_bar">
-      <div class="kv-grid">
+    <!-- Input summary bar (directly determined values) -->
+    <div class="result-bar" id="bar_inputs">
+      <div class="result-bar-title">Measured Inputs</div>
+      <div class="kv-grid kv-grid-5">
+        <div class="kv-item"><span class="kv-key">k<sub>PF</sub></span><span class="kv-val" id="sv_kPF">—</span></div>
+        <div class="kv-item"><span class="kv-key">k<sub>DF</sub></span><span class="kv-val" id="sv_kDF">—</span></div>
+        <div class="kv-item"><span class="kv-key">Φ<sub>PF</sub></span><span class="kv-val" id="sv_PhiPF">—</span></div>
+        <div class="kv-item"><span class="kv-key">Φ<sub>DF</sub></span><span class="kv-val" id="sv_PhiDF">—</span></div>
+        <div class="kv-item"><span class="kv-key">PLQY</span><span class="kv-val" id="sv_PLQY">—</span></div>
+      </div>
+    </div>
+
+    <!-- Directly determined constants bar -->
+    <div class="result-bar" id="bar_direct">
+      <div class="result-bar-title">Directly Determined Constants <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.7rem;">(independent of Φ<sub>Tnr</sub>)</span></div>
+      <div class="kv-grid kv-grid-4">
         <div class="kv-item">
-          <span class="kv-key">k<sub>PF</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Prompt fluorescence rate = 1/τ_PF. Fast eigenvalue of coupled S₁/T₁ system.">i</span></span>
-          <span class="kv-val" id="sv_kPF">—</span>
+          <span class="kv-key">k<sub>sr</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Radiative decay rate S₁→S₀. Uniquely determined from τ_PF, τ_DF, Φ_PF, Φ_DF.">i</span></span>
+          <span class="kv-val" id="sv_ksr">—</span>
         </div>
         <div class="kv-item">
-          <span class="kv-key">k<sub>DF</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Delayed fluorescence rate = 1/τ_DF. Slow triplet harvesting eigenvalue.">i</span></span>
-          <span class="kv-val" id="sv_kDF">—</span>
+          <span class="kv-key">k<sub>s</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Total singlet decay rate = k_sr + k_snr + k_ISC. Uniquely determined.">i</span></span>
+          <span class="kv-val" id="sv_ks">—</span>
         </div>
         <div class="kv-item">
-          <span class="kv-key">Φ<sub>PF</sub></span>
-          <span class="kv-val" id="sv_PhiPF">—</span>
+          <span class="kv-key">k<sub>t</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Total triplet decay rate = k_Tnr + k_RISC. Uniquely determined.">i</span></span>
+          <span class="kv-val" id="sv_kt">—</span>
         </div>
         <div class="kv-item">
-          <span class="kv-key">Φ<sub>DF</sub></span>
-          <span class="kv-val" id="sv_PhiDF">—</span>
-        </div>
-        <div class="kv-item">
-          <span class="kv-key">PLQY <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Total PL quantum yield = Φ_sr / (1 − Φ_ISC·Φ_RISC)">i</span></span>
-          <span class="kv-val" id="sv_PLQY">—</span>
+          <span class="kv-key">k<sub>ISC</sub>·k<sub>RISC</sub> <span class="tip" style="font-size:0.55rem;width:13px;height:13px;" data-tip="Product of ISC and RISC rates. Uniquely determined. Individual values require an additional assumption (Φ_Tnr sweep).">i</span></span>
+          <span class="kv-val" id="sv_kisc_krisc">—</span>
         </div>
       </div>
     </div>
@@ -590,13 +618,12 @@
 
   <!-- ══ RIGHT PANEL: Figure controls ══ -->
   <div class="col-panel right" id="right_panel">
-    <div class="panel-toggle" id="right_toggle" onclick="toggleRight()">▶</div>
-    <div class="panel-content" id="right_content">
+    <div class="panel-content">
 
       <div class="section-label">Figure Controls</div>
 
-      <!-- Line / Marker -->
-      <div class="ctrl-section-label">Lines &amp; Markers</div>
+      <!-- Lines & Markers -->
+      <div class="ctrl-section-label" style="margin-top:0;">Lines &amp; Markers</div>
       <div class="ctrl-grid">
         <div class="ctrl-item">
           <label>Line Width</label>
@@ -637,40 +664,28 @@
         </div>
         <div class="ctrl-item">
           <label>Font Weight</label>
-          <div class="ni-wrap"><input type="number" id="inp_fw_font" min="100" max="900" step="100" value="400" oninput="onSettingChange()"></div>
+          <div class="ni-wrap">
+            <select id="sel_fw" onchange="onSettingChange()">
+              <option value="400" selected>Normal</option>
+              <option value="500">Medium</option>
+              <option value="700">Bold</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <!-- Axis ranges -->
       <div class="ctrl-section-label">Axis Ranges <span style="font-weight:400;text-transform:none;letter-spacing:0;">(blank = auto)</span></div>
       <div class="range-grid">
-        <div>
-          <label>X min</label>
-          <input type="number" id="inp_xmin" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
-        <div>
-          <label>X max</label>
-          <input type="number" id="inp_xmax" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
-        <div>
-          <label>Y min (k)</label>
-          <input type="number" id="inp_ymin_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
-        <div>
-          <label>Y max (k)</label>
-          <input type="number" id="inp_ymax_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
-        <div>
-          <label>Y min (Φ)</label>
-          <input type="number" id="inp_ymin_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
-        <div>
-          <label>Y max (Φ)</label>
-          <input type="number" id="inp_ymax_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
-        </div>
+        <div><label>X min</label><input type="number" id="inp_xmin" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        <div><label>X max</label><input type="number" id="inp_xmax" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        <div><label>Y min (k)</label><input type="number" id="inp_ymin_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        <div><label>Y max (k)</label><input type="number" id="inp_ymax_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        <div><label>Y min (Φ)</label><input type="number" id="inp_ymin_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
+        <div><label>Y max (Φ)</label><input type="number" id="inp_ymax_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()"></div>
       </div>
 
-      <!-- Export & misc -->
+      <!-- Export -->
       <div class="ctrl-section-label">Export</div>
       <div class="ctrl-grid mb-2">
         <div class="ctrl-item">
@@ -678,13 +693,9 @@
           <div class="ni-wrap"><input type="number" id="inp_er" min="400" max="6000" step="100" value="1600" oninput="onSettingChange()"><span class="ni-unit">px</span></div>
         </div>
       </div>
-      <div class="form-check pub-check mb-2">
+      <div class="form-check pub-check mb-3">
         <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
         <label class="form-check-label" for="chk_pub">Publication Mode (white bg)</label>
-      </div>
-      <div class="mb-2">
-        <label style="font-size:0.82rem;color:var(--text-label);">Filename</label>
-        <input type="text" id="inp_fname" class="form-control form-control-sm" value="results" placeholder="results">
       </div>
 
       <!-- Trace Styles -->
@@ -738,32 +749,31 @@ function toggleTheme() {
 }
 
 // ── Theory popup ──────────────────────────────────────────────────────────────
-function openTheory() {
-  $('theory_overlay').classList.add('open');
-  $('btn_theory').classList.add('active');
-}
-function closeTheory() {
-  $('theory_overlay').classList.remove('open');
-  $('btn_theory').classList.remove('active');
-}
-$('theory_overlay').addEventListener('click', e => {
-  if (e.target === $('theory_overlay')) closeTheory();
-});
+function openTheory()  { $('theory_overlay').classList.add('open');    $('btn_theory').classList.add('active'); }
+function closeTheory() { $('theory_overlay').classList.remove('open'); $('btn_theory').classList.remove('active'); }
+$('theory_overlay').addEventListener('click', e => { if (e.target === $('theory_overlay')) closeTheory(); });
 
 // ── Panel collapse ────────────────────────────────────────────────────────────
+const LEFT_W  = 282;
+const RIGHT_W = 304;
 let leftOpen = true, rightOpen = true;
+
 function toggleLeft() {
   leftOpen = !leftOpen;
   $('left_panel').classList.toggle('collapsed', !leftOpen);
-  $('left_toggle').textContent = leftOpen ? '◀' : '▶';
+  const btn = $('left_toggle');
+  btn.style.left = (leftOpen ? LEFT_W : 0) + 'px';
+  btn.textContent = leftOpen ? '‹' : '›';
 }
 function toggleRight() {
   rightOpen = !rightOpen;
   $('right_panel').classList.toggle('collapsed', !rightOpen);
-  $('right_toggle').textContent = rightOpen ? '▶' : '◀';
+  const btn = $('right_toggle');
+  btn.style.right = (rightOpen ? RIGHT_W : 0) + 'px';
+  btn.textContent = rightOpen ? '›' : '‹';
 }
 
-// ── Accordion (left panel sections) ──────────────────────────────────────────
+// ── Accordion ─────────────────────────────────────────────────────────────────
 function toggleAcc(bodyId, hdrId) {
   const body = $(bodyId), hdr = $(hdrId);
   const hidden = body.style.display === 'none';
@@ -775,43 +785,85 @@ function toggleAcc(bodyId, hdrId) {
 function getSettings() {
   const ni = id => { const v = parseFloat($(id)?.value); return isNaN(v) ? null : v; };
   return {
-    lineWidth:   ni('inp_lw')   ?? 2.5,
-    markerSize:  ni('inp_ms')   ?? 8,
-    markerEvery: ni('inp_mi')   ?? 20,
-    frameWidth:  ni('inp_fw')   ?? 1.5,
+    lineWidth:   ni('inp_lw')       ?? 2.5,
+    markerSize:  ni('inp_ms')       ?? 8,
+    markerEvery: ni('inp_mi')       ?? 20,
+    frameWidth:  ni('inp_fw')       ?? 1.5,
     fsTitle:     ni('inp_fs_title') ?? 14,
     fsAxis:      ni('inp_fs_axis')  ?? 12,
     fsTick:      ni('inp_fs_tick')  ?? 11,
     fsLeg:       ni('inp_fs_leg')   ?? 11,
-    fontWeight:  ni('inp_fw_font')  ?? 400,
-    exportWidth: ni('inp_er')   ?? 1600,
+    fontWeight:  parseInt($('sel_fw')?.value ?? '400'),
+    exportWidth: ni('inp_er')       ?? 1600,
     pubMode:     $('chk_pub').checked,
     xMin: ni('inp_xmin'), xMax: ni('inp_xmax'),
     yMinRC: ni('inp_ymin_rc'), yMaxRC: ni('inp_ymax_rc'),
     yMinQY: ni('inp_ymin_qy'), yMaxQY: ni('inp_ymax_qy'),
   };
 }
+function onSettingChange() { if (_lastData) renderResults(_lastData); }
 
-function onSettingChange() {
-  if (_lastData) renderResults(_lastData);
-}
+// ── Input mode toggles ────────────────────────────────────────────────────────
+$('sel_lf_k').addEventListener('change', () => {
+  const isK = $('sel_lf_k').value === '1';
+  $('unit_pf').textContent = isK ? '×10⁸/s' : 'ns';
+  $('unit_df').textContent = isK ? '×10⁵/s' : 'µs';
+  $('tip_pf').dataset.tip = isK
+    ? 'k_PF — Measured prompt fluorescence rate constant (1/τ_PF), units: ×10⁸ s⁻¹. Fast eigenvalue of the coupled S₁/T₁ system, directly obtained from TCSPC fit.'
+    : 'τ_PF — Measured fast decay component from time-resolved PL (TCSPC). Observed lifetime of the prompt emission channel (~ns). An experimental observable.';
+  $('tip_df').dataset.tip = isK
+    ? 'k_DF — Measured delayed fluorescence rate constant (1/τ_DF), units: ×10⁵ s⁻¹. Slow eigenvalue related to the TADF triplet harvesting process.'
+    : 'τ_DF — Measured slow decay component from time-resolved PL (~µs). Observed lifetime of the TADF emission channel. An experimental observable from the thermally activated T₁↔S₁ equilibrium.';
+});
 
-// ── Trace symbols list ────────────────────────────────────────────────────────
+$('sel_qy_b').addEventListener('change', () => {
+  const isB = $('sel_qy_b').value === '1';
+  $('plqy_row').style.display   = isB ? '' : 'none';
+  $('unit_phi_pf').textContent  = isB ? '' : '%';
+  $('unit_phi_df').textContent  = isB ? '' : '%';
+  $('lbl_sym_pf').innerHTML     = isB ? 'B<sub>PF</sub>' : 'Φ<sub>PF</sub>';
+  $('lbl_sym_df').innerHTML     = isB ? 'B<sub>DF</sub>' : 'Φ<sub>DF</sub>';
+  $('tip_phi_pf').dataset.tip   = isB
+    ? 'B_PF — Amplitude of prompt exponential component from the biexponential TRPL fit. Ratio B_PF·τ_PF is proportional to Φ_PF.'
+    : 'Φ_PF — Measured fraction of total PLQY from prompt emission. Obtained by integrating the B_PF·exp(−t/τ_PF) component.';
+  $('tip_phi_df').dataset.tip   = isB
+    ? 'B_DF — Amplitude of delayed exponential component from the biexponential TRPL fit. B_PF/B_DF ratio reflects singlet–triplet harvesting balance.'
+    : 'Φ_DF — Measured fraction of total PLQY from delayed emission. Obtained from the B_DF·exp(−t/τ_DF) component of the TRPL decay.';
+});
+
+// ── Trace symbols & definitions ───────────────────────────────────────────────
 const SYMBOLS = [
   'circle','square','diamond','triangle-up','cross','x',
   'circle-open','square-open','diamond-open','triangle-up-open','cross-open','x-open',
 ];
 
+const RC_DEFS = [
+  { key:'ks',    name:'k<sub>s</sub>',    sym:'circle',       dash:'solid',   darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
+  { key:'ksr',   name:'k<sub>sr</sub>',   sym:'square',       dash:'solid',   darkC:'#48c78e', lightC:'#059669', pubC:'#006400' },
+  { key:'ksnr',  name:'k<sub>snr</sub>',  sym:'diamond',      dash:'solid',   darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
+  { key:'kisc',  name:'k<sub>isc</sub>',  sym:'triangle-up',  dash:'solid',   darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
+  { key:'kt',    name:'k<sub>t</sub>',    sym:'circle-open',  dash:'dash',    darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
+  { key:'ktnr',  name:'k<sub>tnr</sub>',  sym:'square-open',  dash:'dot',     darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
+  { key:'krisc', name:'k<sub>risc</sub>', sym:'diamond-open', dash:'dashdot', darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
+];
+const QY_DEFS = [
+  { key:'phi_sr',   name:'Φ<sub>sr</sub>',   sym:'circle',       dash:'solid',   darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
+  { key:'phi_snr',  name:'Φ<sub>snr</sub>',  sym:'diamond',      dash:'solid',   darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
+  { key:'phi_isc',  name:'Φ<sub>isc</sub>',  sym:'triangle-up',  dash:'solid',   darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
+  { key:'phi_tr',   name:'Φ<sub>tr</sub>',   sym:'circle-open',  dash:'dash',    darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
+  { key:'phi_tnr',  name:'Φ<sub>tnr</sub>',  sym:'square-open',  dash:'dot',     darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
+  { key:'phi_risc', name:'Φ<sub>risc</sub>', sym:'diamond-open', dash:'dashdot', darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
+];
+
 // ── Build trace style controls ────────────────────────────────────────────────
 function buildTraceControls() {
-  _buildTraceCtrl('trace_ctrl_rc', RC_DEFS, 'rc');
-  _buildTraceCtrl('trace_ctrl_qy', QY_DEFS, 'qy');
+  _buildTC('trace_ctrl_rc', RC_DEFS, 'rc');
+  _buildTC('trace_ctrl_qy', QY_DEFS, 'qy');
 }
-function _buildTraceCtrl(containerId, defs, prefix) {
-  const c = $(containerId);
-  c.innerHTML = defs.map((def, i) => {
+function _buildTC(cid, defs, prefix) {
+  $(cid).innerHTML = defs.map((def, i) => {
     const id   = `${prefix}_${i}`;
-    const hex  = def.lightC; // default color
+    const hex  = def.lightC;
     const opts = SYMBOLS.map(s => `<option value="${s}"${s === def.sym ? ' selected' : ''}>${s}</option>`).join('');
     return `<div class="trace-ctrl-row">
       <input type="checkbox" class="tc-vis" id="vis_${id}" checked onchange="onSettingChange()">
@@ -829,39 +881,20 @@ function getTraceOverride(prefix, idx) {
   };
 }
 
-// ── Trace definitions ─────────────────────────────────────────────────────────
-const RC_DEFS = [
-  { key:'ks',    name:'k<sub>s</sub>',    hname:'ks',    sym:'circle',       dash:'solid',   darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
-  { key:'ksr',   name:'k<sub>sr</sub>',   hname:'ksr',   sym:'square',       dash:'solid',   darkC:'#48c78e', lightC:'#059669', pubC:'#006400' },
-  { key:'ksnr',  name:'k<sub>snr</sub>',  hname:'ksnr',  sym:'diamond',      dash:'solid',   darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
-  { key:'kisc',  name:'k<sub>isc</sub>',  hname:'kisc',  sym:'triangle-up',  dash:'solid',   darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
-  { key:'kt',    name:'k<sub>t</sub>',    hname:'kt',    sym:'circle-open',  dash:'dash',    darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
-  { key:'ktnr',  name:'k<sub>tnr</sub>',  hname:'ktnr',  sym:'square-open',  dash:'dot',     darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
-  { key:'krisc', name:'k<sub>risc</sub>', hname:'krisc', sym:'diamond-open', dash:'dashdot', darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
-];
-const QY_DEFS = [
-  { key:'phi_sr',   name:'Φ<sub>sr</sub>',   hname:'Φsr',   sym:'circle',       dash:'solid',   darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
-  { key:'phi_snr',  name:'Φ<sub>snr</sub>',  hname:'Φsnr',  sym:'diamond',      dash:'solid',   darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
-  { key:'phi_isc',  name:'Φ<sub>isc</sub>',  hname:'Φisc',  sym:'triangle-up',  dash:'solid',   darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
-  { key:'phi_tr',   name:'Φ<sub>tr</sub>',   hname:'Φtr',   sym:'circle-open',  dash:'dash',    darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
-  { key:'phi_tnr',  name:'Φ<sub>tnr</sub>',  hname:'Φtnr',  sym:'square-open',  dash:'dot',     darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
-  { key:'phi_risc', name:'Φ<sub>risc</sub>', hname:'Φrisc', sym:'diamond-open', dash:'dashdot', darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
-];
-
+// ── Trace building ────────────────────────────────────────────────────────────
 function sparseOpacity(len, every) {
   return Array.from({length: len}, (_, i) => i % every === 0 ? 1 : 0);
 }
 
 function buildTraces(defs, dataObj, xArr, cfg, isLog, prefix) {
-  const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
-  const colorKey = pubMode ? 'pubC' : (currentTheme === 'dark' ? 'darkC' : 'lightC');
-  const opacity  = sparseOpacity(xArr.length, markerEvery);
-  const htpl     = isLog
+  const { lineWidth, markerSize, markerEvery } = cfg;
+  const opacity = sparseOpacity(xArr.length, markerEvery);
+  const htpl    = isLog
     ? '%{x:.2f}% → %{y:.2e}<extra>%{fullData.name}</extra>'
     : '%{x:.2f}% → %{y:.2f}%<extra>%{fullData.name}</extra>';
   return defs.map((def, i) => {
     const ov    = getTraceOverride(prefix, i);
-    const color = ov.color ?? def[colorKey];
+    const color = ov.color ?? def.lightC;
     const sym   = ov.sym   ?? def.sym;
     return {
       x: xArr, y: dataObj[def.key],
@@ -886,26 +919,23 @@ function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
   const titleC       = pubMode ? '#000000'                : (currentTheme === 'dark' ? '#e4e6f0' : '#1a1d27');
   const zeroC        = pubMode ? '#999999'                : gridC;
   const legendBg     = pubMode ? 'rgba(255,255,255,0.9)'  : (currentTheme === 'dark' ? 'rgba(26,29,39,0.85)' : 'rgba(255,255,255,0.85)');
-  const legendBorder = pubMode ? '#aaaaaa'                : (currentTheme === 'dark' ? '#2e3250'              : '#d0d3e8');
+  const legendBorder = pubMode ? '#aaaaaa'                : (currentTheme === 'dark' ? '#2e3250' : '#d0d3e8');
 
   const axisBase = {
     gridcolor: gridC, zerolinecolor: zeroC, color: textC,
     linecolor: textC, mirror: true, linewidth: frameWidth,
     tickfont: { size: fsTick, weight: fontWeight },
   };
-
   const xaxis = {
     ...axisBase,
     title: { text: 'Φ<sub>Tnr</sub><sup>PL</sup> (%)', font: { size: fsAxis, weight: fontWeight } },
   };
-  if (xMin !== null || xMax !== null)
-    xaxis.range = [xMin ?? undefined, xMax ?? undefined];
+  if (xMin !== null || xMax !== null) xaxis.range = [xMin ?? undefined, xMax ?? undefined];
 
   const yaxis = {
     ...axisBase,
     title: { text: yTitle, font: { size: fsAxis, weight: fontWeight } },
-    type: isLog ? 'log' : 'linear',
-    exponentformat: 'e',
+    type: isLog ? 'log' : 'linear', exponentformat: 'e',
     ...(isLog ? { dtick: 1, minor: { ticks: '' } } : {}),
   };
   if (yRange && (yRange[0] !== null || yRange[1] !== null)) {
@@ -921,12 +951,9 @@ function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
     title: { text: titleText, font: { size: fsTitle, color: titleC, weight: fontWeight }, pad: { t: 4 } },
     xaxis, yaxis,
     legend: {
-      orientation: 'v',
-      x: 1.02, y: 1, xanchor: 'left', yanchor: 'top',
-      bgcolor: legendBg, bordercolor: legendBorder,
-      borderwidth: 1,
-      font: { size: fsLeg, color: textC, weight: fontWeight },
-      traceorder: 'normal',
+      orientation: 'v', x: 1.02, y: 1, xanchor: 'left', yanchor: 'top',
+      bgcolor: legendBg, bordercolor: legendBorder, borderwidth: 1,
+      font: { size: fsLeg, color: textC, weight: fontWeight }, traceorder: 'normal',
     },
     margin: { t: 46, b: 52, l: 72, r: 110 },
   };
@@ -934,36 +961,6 @@ function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
 
 const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
 let _lastData = null;
-
-// ── Input mode toggles ────────────────────────────────────────────────────────
-$('sel_lf_k').addEventListener('change', () => {
-  const isK = $('sel_lf_k').value === '1';
-  $('unit_pf').textContent = isK ? '×10⁸/s' : 'ns';
-  $('unit_df').textContent = isK ? '×10⁵/s' : 'µs';
-  const tipPF = isK
-    ? 'k_PF — Prompt fluorescence rate constant (1/τ_PF), units: ×10⁸ s⁻¹. Fast eigenvalue of the coupled S₁/T₁ system.'
-    : 'τ_PF — Fast decay from S₁→S₀ (direct fluorescence, ~ns). Short-lived component of biexponential PL decay.';
-  const tipDF = isK
-    ? 'k_DF — Delayed fluorescence rate constant (1/τ_DF), units: ×10⁵ s⁻¹. Slow eigenvalue related to triplet harvesting.'
-    : 'τ_DF — Slow TADF decay via T₁→S₁→S₀ (reverse ISC, ~µs). Long-lived component from thermally activated triplet harvesting.';
-  $('tip_pf').dataset.tip = tipPF;
-  $('tip_df').dataset.tip = tipDF;
-});
-
-$('sel_qy_b').addEventListener('change', () => {
-  const isB = $('sel_qy_b').value === '1';
-  $('plqy_row').style.display   = isB ? '' : 'none';
-  $('unit_phi_pf').textContent  = isB ? '' : '%';
-  $('unit_phi_df').textContent  = isB ? '' : '%';
-  $('lbl_sym_pf').innerHTML     = isB ? 'B<sub>PF</sub>' : 'Φ<sub>PF</sub>';
-  $('lbl_sym_df').innerHTML     = isB ? 'B<sub>DF</sub>' : 'Φ<sub>DF</sub>';
-  $('tip_phi_pf').dataset.tip   = isB
-    ? 'B_PF — Amplitude of prompt exponential. Ratio B_PF·τ_PF determines Φ_PF.'
-    : 'Φ_PF — Fraction of PLQY from prompt fluorescence (S₁ direct emission).';
-  $('tip_phi_df').dataset.tip   = isB
-    ? 'B_DF — Amplitude of delayed exponential. B_PF/B_DF ratio reflects singlet–triplet harvesting balance.'
-    : 'Φ_DF — Fraction of PLQY from delayed fluorescence (harvested via RISC). Reflects T₁→S₁ upconversion efficiency.';
-});
 
 // ── Calculate ─────────────────────────────────────────────────────────────────
 $('btn_calc').addEventListener('click', async () => {
@@ -998,11 +995,10 @@ $('btn_dl').addEventListener('click', async () => {
 function downloadChart(divId, suffix, format='png') {
   const cfg   = getSettings();
   const fname = ($('inp_fname').value.trim() || 'results') + '_' + suffix;
-  const h     = Math.round(cfg.exportWidth * 0.75);
-  Plotly.downloadImage(divId, { format, width: cfg.exportWidth, height: h, filename: fname });
+  Plotly.downloadImage(divId, { format, width: cfg.exportWidth, height: Math.round(cfg.exportWidth * 0.75), filename: fname });
 }
 
-// ── Build API payload ─────────────────────────────────────────────────────────
+// ── Build payload ─────────────────────────────────────────────────────────────
 function buildPayload() {
   const pf=parseFloat($('inp_pf').value), df=parseFloat($('inp_df').value);
   const phiPF=parseFloat($('inp_phi_pf').value), phiDF=parseFloat($('inp_phi_df').value);
@@ -1025,14 +1021,27 @@ function renderResults(d) {
 
   $('pre_calc_msg').style.display  = 'none';
   $('charts_row').style.display    = '';
-  $('summary_bar').style.display   = '';
-  $('table_section').style.display = '';
+  $('bar_inputs').style.display    = 'block';
+  $('bar_direct').style.display    = 'block';
+  $('table_section').style.display = 'block';
 
+  // Measured inputs bar
   $('sv_kPF').textContent   = fmt(d.kPF) + ' /s';
   $('sv_kDF').textContent   = fmt(d.kDF) + ' /s';
   $('sv_PhiPF').textContent = d.Phi_PF.toFixed(2) + ' %';
   $('sv_PhiDF').textContent = d.Phi_DF.toFixed(2) + ' %';
   $('sv_PLQY').textContent  = d.PLQY.toFixed(2) + ' %';
+
+  // Directly determined constants (from first x-point; ks, ksr, kt are Φ_Tnr-independent)
+  const rc0 = d.rate_constants;
+  const ksr  = rc0.ksr[0];
+  const ks   = rc0.ks[0];
+  const kt   = rc0.kt[0];
+  const kisckrisc = rc0.kisc[0] * rc0.krisc[0]; // product is constant
+  $('sv_ksr').textContent       = fmt(ksr);
+  $('sv_ks').textContent        = fmt(ks);
+  $('sv_kt').textContent        = fmt(kt);
+  $('sv_kisc_krisc').textContent = fmt(kisckrisc, 2) + ' /s²';
 
   const cfg = getSettings();
 
