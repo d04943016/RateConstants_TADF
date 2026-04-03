@@ -7,192 +7,216 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
   <style>
-    :root {
-      --accent: #4f8ef7;
-      --bg-dark: #0f1117;
-      --bg-card: #1a1d27;
-      --bg-input: #22263a;
-      --border: #2e3250;
+    /* ── Theme Variables ─────────────────────────────── */
+    body.dark {
+      --accent:     #4f8ef7;
+      --bg-page:    #0f1117;
+      --bg-card:    #1a1d27;
+      --bg-input:   #22263a;
+      --border:     #2e3250;
+      --text-main:  #e4e6f0;
       --text-muted: #8b8fa8;
+      --text-label: #b0b4cc;
+      --text-sym:   #7db8ff;
+      --shadow:     rgba(0,0,0,0.4);
+      --chart-paper: rgba(0,0,0,0);
+      --chart-plot:  rgba(0,0,0,0);
+      --chart-grid:  #2e3250;
+      --chart-text:  #b0b4cc;
+      --chart-title: #e4e6f0;
     }
+    body.light {
+      --accent:     #2563eb;
+      --bg-page:    #f0f2f8;
+      --bg-card:    #ffffff;
+      --bg-input:   #f5f6fa;
+      --border:     #d0d3e8;
+      --text-main:  #1a1d27;
+      --text-muted: #6b6f8a;
+      --text-label: #3a3e58;
+      --text-sym:   #2563eb;
+      --shadow:     rgba(0,0,0,0.1);
+      --chart-paper: rgba(0,0,0,0);
+      --chart-plot:  rgba(0,0,0,0);
+      --chart-grid:  #d8daea;
+      --chart-text:  #3a3e58;
+      --chart-title: #1a1d27;
+    }
+
+    /* ── Base ────────────────────────────────────────── */
     body {
-      background: var(--bg-dark);
-      color: #e4e6f0;
+      background: var(--bg-page);
+      color: var(--text-main);
       font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
     }
     .app-header {
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.75rem 1.5rem;
+      position: sticky; top: 0; z-index: 100;
     }
-    .app-header h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #fff;
-      margin: 0;
-      letter-spacing: 0.02em;
-    }
-    .app-header p {
-      font-size: 0.8rem;
+    .app-header h1 { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0; }
+    .app-header p  { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+
+    /* Theme toggle */
+    .theme-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
       color: var(--text-muted);
-      margin: 0;
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
     }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Sidebar ─────────────────────────────────────── */
     .sidebar {
       background: var(--bg-card);
       border-right: 1px solid var(--border);
-      min-height: calc(100vh - 65px);
-      padding: 1.25rem;
+      min-height: calc(100vh - 60px);
+      padding: 1rem 1rem 2rem;
+      overflow-y: auto;
     }
-    .main-content {
-      padding: 1.25rem;
-    }
+    .main-content { padding: 1rem 1.25rem; }
     .section-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
       color: var(--text-muted);
-      margin-bottom: 0.75rem;
-      padding-bottom: 0.4rem;
+      margin-bottom: 0.6rem; padding-bottom: 0.35rem;
       border-bottom: 1px solid var(--border);
     }
-    .form-label {
-      font-size: 0.8rem;
-      color: #b0b4cc;
-      margin-bottom: 0.25rem;
-    }
+    .form-label { font-size: 0.78rem; color: var(--text-label); margin-bottom: 0.2rem; }
     .form-control, .form-select {
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      color: #e4e6f0;
-      font-size: 0.875rem;
+      background: var(--bg-input); border: 1px solid var(--border);
+      color: var(--text-main); font-size: 0.85rem;
     }
     .form-control:focus, .form-select:focus {
-      background: var(--bg-input);
-      border-color: var(--accent);
-      color: #e4e6f0;
-      box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+      background: var(--bg-input); border-color: var(--accent);
+      color: var(--text-main); box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
     }
-    .form-control.is-invalid {
-      border-color: #f74f6a;
-    }
+    .form-control.is-invalid { border-color: #f74f6a; }
     .input-group-text {
-      background: var(--border);
-      border-color: var(--border);
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      min-width: 3.5rem;
-      justify-content: center;
+      background: var(--border); border-color: var(--border);
+      color: var(--text-muted); font-size: 0.78rem;
+      min-width: 3.4rem; justify-content: center;
     }
+    .param-hint {
+      font-size: 0.68rem; color: var(--text-muted);
+      margin-top: 0.15rem; margin-bottom: 0.55rem; line-height: 1.4;
+    }
+    .param-hint .symbol { color: var(--text-sym); font-style: italic; }
+
+    /* ── Chart settings sliders ──────────────────────── */
+    .settings-panel { padding-top: 0.25rem; }
+    .sld-row { margin-bottom: 0.6rem; }
+    .sld-row label { font-size: 0.72rem; color: var(--text-label); display: flex; justify-content: space-between; margin-bottom: 0.15rem; }
+    .sld-row label span { color: var(--accent); font-weight: 600; }
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+    .pub-check { font-size: 0.75rem; color: var(--text-label); }
+    .pub-check input { accent-color: var(--accent); }
+    .settings-toggle {
+      cursor: pointer; user-select: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .settings-toggle .arrow { transition: transform 0.2s; font-size: 0.7rem; }
+    .settings-toggle.collapsed .arrow { transform: rotate(-90deg); }
+
+    /* ── Buttons ─────────────────────────────────────── */
     .btn-calculate {
-      background: var(--accent);
-      border: none;
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 0.6rem 1rem;
-      width: 100%;
-      transition: opacity 0.15s;
+      background: var(--accent); border: none; color: #fff;
+      font-weight: 600; font-size: 0.88rem; padding: 0.55rem 1rem;
+      width: 100%; transition: opacity 0.15s; border-radius: 6px;
     }
     .btn-calculate:hover { opacity: 0.88; color: #fff; }
     .btn-calculate:disabled { opacity: 0.5; }
     .btn-download {
-      background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      font-size: 0.8rem;
-      padding: 0.4rem 0.85rem;
-      transition: background 0.15s;
+      background: transparent; border: 1px solid var(--accent);
+      color: var(--accent); font-size: 0.78rem; padding: 0.35rem 0.75rem;
+      transition: background 0.15s; border-radius: 5px;
     }
-    .btn-download:hover { background: rgba(79,142,247,0.12); color: var(--accent); }
-    .btn-download:disabled { opacity: 0.4; }
+    .btn-download:hover { background: rgba(79,142,247,0.1); color: var(--accent); }
+    .btn-download:disabled { opacity: 0.35; }
+    .spinner-border { width: 1.1rem; height: 1.1rem; border-width: 2px; }
+
+    /* ── Result cards ────────────────────────────────── */
     .result-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.9rem 1.1rem; margin-bottom: 1rem;
     }
     .result-card-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.65rem;
     }
-    .kv-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.4rem 1.5rem;
-    }
+    .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1.5rem; }
     .kv-item { display: flex; justify-content: space-between; align-items: baseline; }
-    .kv-key { font-size: 0.78rem; color: var(--text-muted); }
-    .kv-val { font-size: 0.82rem; font-weight: 600; color: #e4e6f0; font-family: monospace; }
-    .summary-table { font-size: 0.78rem; }
+    .kv-key { font-size: 0.76rem; color: var(--text-muted); }
+    .kv-val { font-size: 0.8rem; font-weight: 600; color: var(--text-main); font-family: monospace; }
+
+    /* ── Table ───────────────────────────────────────── */
+    .summary-table {
+      font-size: 0.75rem; min-width: 960px;
+      --bs-table-bg: transparent; --bs-table-color: var(--text-label);
+      --bs-table-border-color: var(--border);
+      --bs-table-striped-bg: transparent; --bs-table-striped-color: var(--text-label);
+      --bs-table-hover-bg: rgba(79,142,247,0.06); --bs-table-hover-color: var(--text-main);
+      --bs-table-active-bg: transparent;
+    }
     .summary-table th {
-      font-weight: 600;
-      color: var(--text-muted);
-      background: var(--bg-input);
-      border-color: var(--border);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-weight: 600; color: var(--text-muted);
+      background: var(--bg-input) !important; border-color: var(--border) !important;
+      font-size: 0.69rem; text-transform: uppercase; letter-spacing: 0.05em;
+      white-space: nowrap; padding: 0.45rem 0.55rem;
     }
     .summary-table td {
-      border-color: var(--border);
-      color: #c8cbdf;
-      font-family: monospace;
+      border-color: var(--border) !important; color: var(--text-label);
+      font-family: monospace; white-space: nowrap;
+      padding: 0.4rem 0.55rem; background: transparent !important;
     }
-    .summary-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .summary-table tbody tr:hover td { background: rgba(79,142,247,0.06) !important; color: var(--text-main); }
+    .summary-table td:first-child { font-family: inherit; color: var(--text-muted); font-size: 0.73rem; }
+
+    /* ── Charts ──────────────────────────────────────── */
     .chart-wrapper {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem;
+      margin-bottom: 0.5rem; min-height: 360px;
+      display: flex; flex-direction: column; justify-content: center;
     }
+    #chart_rc, #chart_qy { min-height: 360px; }
     .placeholder-msg {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 260px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      flex-direction: column;
-      gap: 0.5rem;
+      display: flex; align-items: center; justify-content: center;
+      height: 320px; color: var(--text-muted);
+      font-size: 0.85rem; flex-direction: column; gap: 0.5rem;
     }
     .placeholder-icon { font-size: 2rem; opacity: 0.3; }
-    .spinner-border { width: 1.2rem; height: 1.2rem; border-width: 2px; }
+    .chart-btns { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.25rem; margin-bottom: 0.75rem; }
+
     #alertBox { display: none; }
-    .badge-plqy {
-      background: rgba(79,142,247,0.15);
-      color: var(--accent);
-      border-radius: 4px;
-      font-size: 0.75rem;
-      padding: 0.2rem 0.5rem;
-      font-weight: 600;
-    }
   </style>
 </head>
-<body>
+<body class="dark">
 
-<!-- Header -->
+<!-- ── Header ── -->
 <div class="app-header d-flex align-items-center justify-content-between">
   <div>
     <h1>TADF Rate Constant Calculator</h1>
     <p>Three-level excitonic system &mdash; singlet &amp; triplet state dynamics</p>
   </div>
+  <button class="theme-btn" id="btn_theme" onclick="toggleTheme()">☀ Light Mode</button>
 </div>
 
 <div class="container-fluid p-0">
   <div class="row g-0">
 
-    <!-- ── Sidebar: Inputs ── -->
+    <!-- ── Sidebar ── -->
     <div class="col-12 col-lg-3 sidebar">
 
-      <!-- Lifetime / Rate Constant -->
+      <!-- Decay Parameters -->
       <div class="mb-3">
         <div class="section-label">Decay Parameters</div>
         <label class="form-label">Input Mode</label>
@@ -200,21 +224,25 @@
           <option value="0">Lifetime (τ)</option>
           <option value="1">Rate Constant (k)</option>
         </select>
-
         <label class="form-label" id="lbl_pf">Prompt Fluorescence (PF)</label>
-        <div class="input-group input-group-sm mb-2">
+        <div class="input-group input-group-sm mb-1">
           <input type="number" id="inp_pf" class="form-control" value="15" step="any" min="0" />
           <span class="input-group-text" id="unit_pf">ns</span>
         </div>
-
+        <div class="param-hint" id="hint_pf">
+          <span class="symbol">τ<sub>PF</sub></span> — Fast decay from S₁→S₀ (direct fluorescence, ~ns)
+        </div>
         <label class="form-label" id="lbl_df">Delayed Fluorescence (DF)</label>
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group-sm mb-1">
           <input type="number" id="inp_df" class="form-control" value="2.9" step="any" min="0" />
           <span class="input-group-text" id="unit_df">µs</span>
         </div>
+        <div class="param-hint" id="hint_df">
+          <span class="symbol">τ<sub>DF</sub></span> — Slow TADF decay via T₁→S₁→S₀ (reverse ISC, ~µs)
+        </div>
       </div>
 
-      <!-- Q.Y. / B -->
+      <!-- Quantum Yield / Prefactor -->
       <div class="mb-3">
         <div class="section-label">Quantum Yield / Prefactor</div>
         <label class="form-label">Input Mode</label>
@@ -222,52 +250,90 @@
           <option value="0">Quantum Yield (Φ)</option>
           <option value="1">B (exponent prefactor)</option>
         </select>
-
         <label class="form-label" id="lbl_phi_pf">Φ<sub>PF</sub></label>
-        <div class="input-group input-group-sm mb-2">
+        <div class="input-group input-group-sm mb-1">
           <input type="number" id="inp_phi_pf" class="form-control" value="70" step="any" min="0" />
           <span class="input-group-text" id="unit_phi_pf">%</span>
         </div>
-
+        <div class="param-hint" id="hint_phi_pf">
+          <span class="symbol" id="hint_sym_pf">Φ<sub>PF</sub></span> — <span id="hint_txt_pf">Fraction of PLQY from prompt fluorescence (S₁ direct emission)</span>
+        </div>
         <label class="form-label" id="lbl_phi_df">Φ<sub>DF</sub></label>
-        <div class="input-group input-group-sm mb-2">
+        <div class="input-group input-group-sm mb-1">
           <input type="number" id="inp_phi_df" class="form-control" value="12" step="any" min="0" />
           <span class="input-group-text" id="unit_phi_df">%</span>
         </div>
-
+        <div class="param-hint" id="hint_phi_df">
+          <span class="symbol" id="hint_sym_df">Φ<sub>DF</sub></span> — <span id="hint_txt_df">Fraction of PLQY from delayed fluorescence (harvested via RISC)</span>
+        </div>
         <div id="plqy_row" style="display:none;">
           <label class="form-label">PLQY</label>
-          <div class="input-group input-group-sm">
+          <div class="input-group input-group-sm mb-1">
             <input type="number" id="inp_plqy" class="form-control" value="100" step="any" min="0" max="100" />
             <span class="input-group-text">%</span>
+          </div>
+          <div class="param-hint">
+            <span class="symbol">PLQY</span> — Total PL quantum yield; required when using B prefactors
           </div>
         </div>
       </div>
 
-      <!-- File name + actions -->
+      <!-- Export -->
       <div class="mb-3">
         <div class="section-label">Export</div>
         <label class="form-label">Filename</label>
         <input type="text" id="inp_fname" class="form-control form-control-sm mb-2" value="results" placeholder="results" />
       </div>
 
+      <!-- Chart Settings -->
+      <div class="mb-3">
+        <div class="section-label settings-toggle" id="settings_toggle" onclick="toggleSettings()">
+          <span>Chart Settings</span>
+          <span class="arrow">▾</span>
+        </div>
+        <div class="settings-panel" id="settings_panel">
+          <div class="sld-row">
+            <label>Line Width <span id="lw_val">2.5</span> px</label>
+            <input type="range" id="sld_lw" min="1" max="5" step="0.5" value="2.5" oninput="onSettingChange()">
+          </div>
+          <div class="sld-row">
+            <label>Marker Size <span id="ms_val">8</span> px</label>
+            <input type="range" id="sld_ms" min="4" max="16" step="1" value="8" oninput="onSettingChange()">
+          </div>
+          <div class="sld-row">
+            <label>Marker Every <span id="mi_val">20</span> pts</label>
+            <input type="range" id="sld_mi" min="5" max="50" step="5" value="20" oninput="onSettingChange()">
+          </div>
+          <div class="sld-row">
+            <label>Font Size <span id="fs_val">13</span> pt</label>
+            <input type="range" id="sld_fs" min="9" max="20" step="1" value="13" oninput="onSettingChange()">
+          </div>
+          <div class="sld-row">
+            <label>Export Resolution <span id="er_val">1600</span> px wide</label>
+            <input type="range" id="sld_er" min="800" max="3200" step="400" value="1600" oninput="onSettingChange()">
+          </div>
+          <div class="form-check pub-check mt-1">
+            <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
+            <label class="form-check-label" for="chk_pub">
+              Publication Mode (white background)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
       <button id="btn_calc" class="btn btn-calculate mb-2">
         <span id="calc_spinner" class="spinner-border me-2" role="status" style="display:none;"></span>
         Calculate
       </button>
-      <button id="btn_dl" class="btn btn-download w-100" disabled>
-        ↓ Download Data (.txt)
-      </button>
-
-      <!-- Error -->
-      <div id="alertBox" class="alert alert-danger mt-3 py-2 px-3" style="font-size:0.8rem;"></div>
-
+      <button id="btn_dl" class="btn btn-download w-100" disabled>↓ Download Data (.txt)</button>
+      <div id="alertBox" class="alert alert-danger mt-3 py-2 px-3" style="font-size:0.78rem;"></div>
     </div>
 
-    <!-- ── Main: Results ── -->
+    <!-- ── Main ── -->
     <div class="col-12 col-lg-9 main-content">
 
-      <!-- Input summary row -->
+      <!-- Summary bar -->
       <div id="summary_bar" class="result-card" style="display:none;">
         <div class="result-card-title">Input Summary</div>
         <div class="kv-grid">
@@ -280,7 +346,7 @@
       </div>
 
       <div class="row g-3">
-        <!-- Chart 1: Rate constants -->
+        <!-- Chart 1 -->
         <div class="col-12 col-xl-6">
           <div class="chart-wrapper">
             <div id="chart_rc">
@@ -290,8 +356,12 @@
               </div>
             </div>
           </div>
+          <div class="chart-btns" id="dl_rc_row" style="display:none;">
+            <button class="btn btn-download btn-sm" onclick="downloadChart('chart_rc','rate_constants')">↓ PNG</button>
+            <button class="btn btn-download btn-sm" onclick="downloadChart('chart_rc','rate_constants','svg')">↓ SVG</button>
+          </div>
         </div>
-        <!-- Chart 2: Quantum yields -->
+        <!-- Chart 2 -->
         <div class="col-12 col-xl-6">
           <div class="chart-wrapper">
             <div id="chart_qy">
@@ -300,6 +370,10 @@
                 <span>Results will appear here</span>
               </div>
             </div>
+          </div>
+          <div class="chart-btns" id="dl_qy_row" style="display:none;">
+            <button class="btn btn-download btn-sm" onclick="downloadChart('chart_qy','process_efficiency')">↓ PNG</button>
+            <button class="btn btn-download btn-sm" onclick="downloadChart('chart_qy','process_efficiency','svg')">↓ SVG</button>
           </div>
         </div>
       </div>
@@ -312,17 +386,17 @@
             <table class="table table-sm summary-table mb-0">
               <thead>
                 <tr>
-                  <th>Condition</th>
-                  <th>k<sub>s</sub></th>
-                  <th>k<sub>sr</sub></th>
-                  <th>k<sub>snr</sub></th>
-                  <th>k<sub>isc</sub></th>
-                  <th>k<sub>t</sub></th>
-                  <th>k<sub>tnr</sub></th>
-                  <th>k<sub>risc</sub></th>
-                  <th>Φ<sub>sr</sub>(%)</th>
-                  <th>Φ<sub>isc</sub>(%)</th>
-                  <th>Φ<sub>risc</sub>(%)</th>
+                  <th style="min-width:120px">Condition</th>
+                  <th>k<sub>s</sub> (s⁻¹)</th>
+                  <th>k<sub>sr</sub> (s⁻¹)</th>
+                  <th>k<sub>snr</sub> (s⁻¹)</th>
+                  <th>k<sub>isc</sub> (s⁻¹)</th>
+                  <th>k<sub>t</sub> (s⁻¹)</th>
+                  <th>k<sub>tnr</sub> (s⁻¹)</th>
+                  <th>k<sub>risc</sub> (s⁻¹)</th>
+                  <th>Φ<sub>sr</sub> (%)</th>
+                  <th>Φ<sub>isc</sub> (%)</th>
+                  <th>Φ<sub>risc</sub> (%)</th>
                 </tr>
               </thead>
               <tbody id="summary_tbody"></tbody>
@@ -336,29 +410,156 @@
 </div>
 
 <script>
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
-const fmt = (v, digits=3) => v.toExponential(digits);
-const fmtPct = (v, digits=2) => v.toFixed(digits) + ' %';
+const fmt = (v, d=3) => v.toExponential(d);
 
-const PLOTLY_LAYOUT_BASE = {
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor:  'rgba(0,0,0,0)',
-  font: { color: '#b0b4cc', size: 11 },
-  xaxis: {
-    title: { text: 'Φ<sub>Tnr</sub><sup>PL</sup> (%)', font: { size: 12 } },
-    gridcolor: '#2e3250', zerolinecolor: '#2e3250', color: '#8b8fa8',
-  },
-  legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } },
-  margin: { t: 40, b: 50, l: 60, r: 20 },
-};
+// ── Theme ─────────────────────────────────────────────────────────────────────
+let currentTheme = 'dark';
+function toggleTheme() {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.body.className = currentTheme;
+  $('btn_theme').textContent = currentTheme === 'dark' ? '☀ Light Mode' : '🌙 Dark Mode';
+  if (_lastData) renderResults(_lastData);
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+let _settingsOpen = true;
+function toggleSettings() {
+  _settingsOpen = !_settingsOpen;
+  $('settings_panel').style.display = _settingsOpen ? '' : 'none';
+  $('settings_toggle').classList.toggle('collapsed', !_settingsOpen);
+}
+
+function getSettings() {
+  return {
+    lineWidth:   parseFloat($('sld_lw').value),
+    markerSize:  parseInt($('sld_ms').value),
+    markerEvery: parseInt($('sld_mi').value),
+    fontSize:    parseInt($('sld_fs').value),
+    exportWidth: parseInt($('sld_er').value),
+    pubMode:     $('chk_pub').checked,
+  };
+}
+
+function onSettingChange() {
+  $('lw_val').textContent = $('sld_lw').value;
+  $('ms_val').textContent = $('sld_ms').value;
+  $('mi_val').textContent = $('sld_mi').value;
+  $('fs_val').textContent = $('sld_fs').value;
+  $('er_val').textContent = $('sld_er').value;
+  if (_lastData) renderResults(_lastData);
+}
+
+// ── Trace definitions (symbol + dash + colors) ────────────────────────────────
+// Singlet-related: filled symbols + solid line
+// Triplet-related: open symbols + dashed line
+const RC_DEFS = [
+  { key:'ks',    name:'k<sub>s</sub>',    sym:'circle',           dash:'solid',  darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
+  { key:'ksr',   name:'k<sub>sr</sub>',   sym:'square',           dash:'solid',  darkC:'#48c78e', lightC:'#059669', pubC:'#006400' },
+  { key:'ksnr',  name:'k<sub>snr</sub>',  sym:'diamond',          dash:'solid',  darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
+  { key:'kisc',  name:'k<sub>isc</sub>',  sym:'triangle-up',      dash:'solid',  darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
+  { key:'kt',    name:'k<sub>t</sub>',    sym:'circle-open',      dash:'dash',   darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
+  { key:'ktnr',  name:'k<sub>tnr</sub>',  sym:'square-open',      dash:'dot',    darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
+  { key:'krisc', name:'k<sub>risc</sub>', sym:'diamond-open',     dash:'dashdot',darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
+];
+const QY_DEFS = [
+  { key:'phi_sr',   name:'Φ<sub>sr</sub>',   sym:'circle',       dash:'solid',  darkC:'#4f8ef7', lightC:'#1d4ed8', pubC:'#003f88' },
+  { key:'phi_snr',  name:'Φ<sub>snr</sub>',  sym:'diamond',      dash:'solid',  darkC:'#f78f4f', lightC:'#ea580c', pubC:'#c94a00' },
+  { key:'phi_isc',  name:'Φ<sub>isc</sub>',  sym:'triangle-up',  dash:'solid',  darkC:'#c96ef7', lightC:'#7c3aed', pubC:'#5a189a' },
+  { key:'phi_tr',   name:'Φ<sub>tr</sub>',   sym:'circle-open',  dash:'dash',   darkC:'#f74f6a', lightC:'#dc2626', pubC:'#9e0000' },
+  { key:'phi_tnr',  name:'Φ<sub>tnr</sub>',  sym:'square-open',  dash:'dot',    darkC:'#f7c84f', lightC:'#d97706', pubC:'#8b5e00' },
+  { key:'phi_risc', name:'Φ<sub>risc</sub>', sym:'diamond-open', dash:'dashdot',darkC:'#4ff7e8', lightC:'#0891b2', pubC:'#005f73' },
+];
+
+function sparseOpacity(len, every) {
+  return Array.from({length: len}, (_, i) => i % every === 0 ? 1 : 0);
+}
+
+function buildTraces(defs, dataObj, xArr, cfg) {
+  const { lineWidth, markerSize, markerEvery, pubMode } = cfg;
+  const colorKey = pubMode ? 'pubC' : (currentTheme === 'dark' ? 'darkC' : 'lightC');
+  const opacity = sparseOpacity(xArr.length, markerEvery);
+
+  return defs.map(def => ({
+    x: xArr,
+    y: dataObj[def.key],
+    name: def.name,
+    type: 'scatter',
+    mode: 'lines+markers',
+    line: {
+      color: def[colorKey],
+      width: lineWidth,
+      dash: def.dash,
+    },
+    marker: {
+      symbol: def.sym,
+      size: markerSize,
+      color: def[colorKey],
+      opacity: opacity,
+      line: { width: def.sym.includes('open') ? Math.max(1.5, lineWidth * 0.6) : 0, color: def[colorKey] },
+    },
+  }));
+}
+
+function buildLayout(titleText, yTitle, isLog, cfg) {
+  const { fontSize, pubMode } = cfg;
+  const paperBg  = pubMode ? 'white' : 'rgba(0,0,0,0)';
+  const plotBg   = pubMode ? 'white' : 'rgba(0,0,0,0)';
+  const gridC    = pubMode ? '#cccccc' : (currentTheme === 'dark' ? '#2e3250' : '#d8daea');
+  const textC    = pubMode ? '#111111' : (currentTheme === 'dark' ? '#b0b4cc' : '#3a3e58');
+  const titleC   = pubMode ? '#000000' : (currentTheme === 'dark' ? '#e4e6f0' : '#1a1d27');
+  const zeroC    = pubMode ? '#999999' : gridC;
+  const legendBg = pubMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0)';
+  const legendBorder = pubMode ? '#cccccc' : 'rgba(0,0,0,0)';
+
+  return {
+    paper_bgcolor: paperBg,
+    plot_bgcolor:  plotBg,
+    font: { color: textC, size: fontSize },
+    title: { text: titleText, font: { size: fontSize + 2, color: titleC }, pad: { t: 4 } },
+    xaxis: {
+      title: { text: 'Φ<sub>Tnr</sub><sup>PL</sup> (%)', font: { size: fontSize } },
+      gridcolor: gridC, zerolinecolor: zeroC, color: textC,
+      linecolor: textC, mirror: true,
+      tickfont: { size: fontSize - 1 },
+    },
+    yaxis: {
+      title: { text: yTitle, font: { size: fontSize } },
+      type: isLog ? 'log' : 'linear',
+      exponentformat: 'e',
+      gridcolor: gridC, zerolinecolor: zeroC, color: textC,
+      linecolor: textC, mirror: true,
+      tickfont: { size: fontSize - 1 },
+    },
+    legend: {
+      orientation: 'h', x: 0, y: -0.25,
+      bgcolor: legendBg,
+      bordercolor: legendBorder, borderwidth: pubMode ? 1 : 0,
+      font: { size: fontSize - 1, color: textC },
+      traceorder: 'normal',
+    },
+    margin: { t: 50, b: 90, l: 70, r: 20 },
+    height: 360,
+  };
+}
+
 const PLOTLY_CONFIG = { responsive: true, displayModeBar: false };
+
+// ── Last data cache (for re-render on settings change) ────────────────────────
+let _lastData = null;
 
 // ── Mode toggles ──────────────────────────────────────────────────────────────
 $('sel_lf_k').addEventListener('change', () => {
   const isK = $('sel_lf_k').value === '1';
   $('unit_pf').textContent = isK ? '×10⁸ /s' : 'ns';
   $('unit_df').textContent = isK ? '×10⁵ /s' : 'µs';
+  $('hint_pf').innerHTML = isK
+    ? '<span class="symbol">k<sub>PF</sub></span> — Prompt fluorescence rate constant (1/τ<sub>PF</sub>), unit: ×10⁸ s⁻¹'
+    : '<span class="symbol">τ<sub>PF</sub></span> — Fast decay from S₁→S₀ (direct fluorescence, ~ns)';
+  $('hint_df').innerHTML = isK
+    ? '<span class="symbol">k<sub>DF</sub></span> — Delayed fluorescence rate constant (1/τ<sub>DF</sub>), unit: ×10⁵ s⁻¹'
+    : '<span class="symbol">τ<sub>DF</sub></span> — Slow TADF decay via T₁→S₁→S₀ (reverse ISC, ~µs)';
 });
 
 $('sel_qy_b').addEventListener('change', () => {
@@ -368,93 +569,78 @@ $('sel_qy_b').addEventListener('change', () => {
   $('unit_phi_df').textContent = isB ? '' : '%';
   $('lbl_phi_pf').innerHTML = isB ? 'B<sub>PF</sub>' : 'Φ<sub>PF</sub>';
   $('lbl_phi_df').innerHTML = isB ? 'B<sub>DF</sub>' : 'Φ<sub>DF</sub>';
+  $('hint_sym_pf').innerHTML = isB ? 'B<sub>PF</sub>' : 'Φ<sub>PF</sub>';
+  $('hint_sym_df').innerHTML = isB ? 'B<sub>DF</sub>' : 'Φ<sub>DF</sub>';
+  $('hint_txt_pf').textContent = isB
+    ? 'Amplitude of prompt exponential: I(t) = B_PF·exp(−t/τ_PF) + B_DF·exp(−t/τ_DF)'
+    : 'Fraction of PLQY from prompt fluorescence (S₁ direct emission)';
+  $('hint_txt_df').textContent = isB
+    ? 'Amplitude of delayed exponential; B_PF/B_DF ratio reflects singlet–triplet harvesting'
+    : 'Fraction of PLQY from delayed fluorescence (harvested via RISC)';
 });
 
-// ── Calculate ────────────────────────────────────────────────────────────────
+// ── Calculate ─────────────────────────────────────────────────────────────────
 $('btn_calc').addEventListener('click', async () => {
-  hideError();
-  setLoading(true);
-
+  hideError(); setLoading(true);
   const payload = buildPayload();
   if (!payload) { setLoading(false); return; }
-
   try {
-    const res = await fetch('/api/calculate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    const res  = await fetch('/api/calculate', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
     const json = await res.json();
     if (json.status !== 'ok') throw new Error(json.message);
-    renderResults(json.data);
+    _lastData = json.data;
+    renderResults(_lastData);
     $('btn_dl').disabled = false;
-  } catch (err) {
-    showError(err.message);
-  } finally {
-    setLoading(false);
-  }
+    $('dl_rc_row').style.display = 'flex';
+    $('dl_qy_row').style.display = 'flex';
+  } catch(err) { showError(err.message); }
+  finally { setLoading(false); }
 });
 
-// ── Download ─────────────────────────────────────────────────────────────────
+// ── Download data ─────────────────────────────────────────────────────────────
 $('btn_dl').addEventListener('click', async () => {
-  const payload = buildPayload();
-  if (!payload) return;
+  const payload = buildPayload(); if (!payload) return;
   payload.filename = $('inp_fname').value.trim() || 'results';
-
   try {
-    const res = await fetch('/api/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch('/api/download', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
     if (!res.ok) { const j = await res.json(); throw new Error(j.message); }
     const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = (payload.filename || 'results') + '.txt';
+    a.href = URL.createObjectURL(blob);
+    a.download = payload.filename + '.txt';
     a.click();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    showError(err.message);
-  }
+  } catch(err) { showError(err.message); }
 });
+
+// ── Download chart image ──────────────────────────────────────────────────────
+function downloadChart(divId, suffix, format='png') {
+  const cfg   = getSettings();
+  const fname = ($('inp_fname').value.trim() || 'results') + '_' + suffix;
+  const h     = Math.round(cfg.exportWidth * 0.55);
+  Plotly.downloadImage(divId, { format, width: cfg.exportWidth, height: h, filename: fname });
+}
 
 // ── Build payload ─────────────────────────────────────────────────────────────
 function buildPayload() {
-  const pf     = parseFloat($('inp_pf').value);
-  const df     = parseFloat($('inp_df').value);
-  const phiPF  = parseFloat($('inp_phi_pf').value);
-  const phiDF  = parseFloat($('inp_phi_df').value);
-  const plqy   = parseFloat($('inp_plqy').value);
-
-  let valid = true;
-  [$('inp_pf'), $('inp_df'), $('inp_phi_pf'), $('inp_phi_df')].forEach(el => {
+  const pf=parseFloat($('inp_pf').value), df=parseFloat($('inp_df').value);
+  const phiPF=parseFloat($('inp_phi_pf').value), phiDF=parseFloat($('inp_phi_df').value);
+  const plqy=parseFloat($('inp_plqy').value);
+  let ok = true;
+  [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df')].forEach(el => {
     el.classList.remove('is-invalid');
-    if (isNaN(parseFloat(el.value)) || parseFloat(el.value) <= 0) {
-      el.classList.add('is-invalid'); valid = false;
-    }
+    if (isNaN(parseFloat(el.value)) || parseFloat(el.value) <= 0) { el.classList.add('is-invalid'); ok=false; }
   });
-  if ($('sel_qy_b').value === '1') {
-    if (isNaN(plqy) || plqy <= 0 || plqy > 100) {
-      $('inp_plqy').classList.add('is-invalid'); valid = false;
-    }
-  }
-  if (!valid) { showError('Please correct the highlighted fields.'); return null; }
-
-  return {
-    mode_lf_k:    parseInt($('sel_lf_k').value),
-    mode_qy_b:    parseInt($('sel_qy_b').value),
-    pf_value:     pf,
-    df_value:     df,
-    phi_pf_value: phiPF,
-    phi_df_value: phiDF,
-    plqy_value:   plqy,
-  };
+  if ($('sel_qy_b').value==='1' && (isNaN(plqy)||plqy<=0||plqy>100)) { $('inp_plqy').classList.add('is-invalid'); ok=false; }
+  if (!ok) { showError('Please correct the highlighted fields.'); return null; }
+  return { mode_lf_k:parseInt($('sel_lf_k').value), mode_qy_b:parseInt($('sel_qy_b').value),
+           pf_value:pf, df_value:df, phi_pf_value:phiPF, phi_df_value:phiDF, plqy_value:plqy };
 }
 
 // ── Render results ────────────────────────────────────────────────────────────
 function renderResults(d) {
+  Plotly.purge('chart_rc');
+  Plotly.purge('chart_qy');
+
   // Summary bar
   $('sv_kPF').textContent  = fmt(d.kPF) + ' /s';
   $('sv_kDF').textContent  = fmt(d.kDF) + ' /s';
@@ -463,88 +649,44 @@ function renderResults(d) {
   $('sv_PLQY').textContent  = d.PLQY.toFixed(2) + ' %';
   $('summary_bar').style.display = '';
 
-  // Chart 1 — Rate constants (log scale)
-  const rc = d.rate_constants;
-  const rcTraces = [
-    { y: rc.ks,    name: 'k<sub>s</sub>',    line: { color: '#4f8ef7' } },
-    { y: rc.ksr,   name: 'k<sub>sr</sub>',   line: { color: '#48c78e' } },
-    { y: rc.ksnr,  name: 'k<sub>snr</sub>',  line: { color: '#f78f4f' } },
-    { y: rc.kisc,  name: 'k<sub>isc</sub>',  line: { color: '#c96ef7' } },
-    { y: rc.kt,    name: 'k<sub>t</sub>',    line: { color: '#f74f6a', dash: 'dash' } },
-    { y: rc.ktnr,  name: 'k<sub>tnr</sub>',  line: { color: '#f7c84f', dash: 'dash' } },
-    { y: rc.krisc, name: 'k<sub>risc</sub>', line: { color: '#4ff7e8', dash: 'dash' } },
-  ].map(t => ({ ...t, x: d.x, type: 'scatter', mode: 'lines', line: { ...t.line, width: 2 } }));
+  const cfg = getSettings();
 
-  const rcLayout = {
-    ...PLOTLY_LAYOUT_BASE,
-    title: { text: 'Rate Constants vs Φ<sup>PL</sup><sub>Tnr</sub>', font: { size: 13, color: '#e4e6f0' } },
-    yaxis: {
-      title: { text: 'Rate Constant (1/s)', font: { size: 12 } },
-      type: 'log', gridcolor: '#2e3250', color: '#8b8fa8',
-    },
-  };
-  Plotly.react('chart_rc', rcTraces, rcLayout, PLOTLY_CONFIG);
+  // Chart 1 — Rate constants
+  Plotly.react('chart_rc',
+    buildTraces(RC_DEFS, d.rate_constants, d.x, cfg),
+    buildLayout('Rate Constants vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Rate Constant (s⁻¹)', true, cfg),
+    PLOTLY_CONFIG);
 
   // Chart 2 — Quantum yields
-  const qy = d.quantum_yields;
-  const qyTraces = [
-    { y: qy.phi_sr,   name: 'Φ<sub>sr</sub>',   line: { color: '#4f8ef7' } },
-    { y: qy.phi_snr,  name: 'Φ<sub>snr</sub>',  line: { color: '#f78f4f' } },
-    { y: qy.phi_isc,  name: 'Φ<sub>isc</sub>',  line: { color: '#c96ef7' } },
-    { y: qy.phi_tr,   name: 'Φ<sub>tr</sub>',   line: { color: '#f74f6a', dash: 'dash' } },
-    { y: qy.phi_tnr,  name: 'Φ<sub>tnr</sub>',  line: { color: '#f7c84f', dash: 'dash' } },
-    { y: qy.phi_risc, name: 'Φ<sub>risc</sub>', line: { color: '#4ff7e8', dash: 'dash' } },
-  ].map(t => ({ ...t, x: d.x, type: 'scatter', mode: 'lines', line: { ...t.line, width: 2 } }));
-
-  const qyLayout = {
-    ...PLOTLY_LAYOUT_BASE,
-    title: { text: 'Process Efficiency vs Φ<sup>PL</sup><sub>Tnr</sub>', font: { size: 13, color: '#e4e6f0' } },
-    yaxis: {
-      title: { text: 'Efficiency (%)', font: { size: 12 } },
-      gridcolor: '#2e3250', color: '#8b8fa8',
-    },
-  };
-  Plotly.react('chart_qy', qyTraces, qyLayout, PLOTLY_CONFIG);
+  Plotly.react('chart_qy',
+    buildTraces(QY_DEFS, d.quantum_yields, d.x, cfg),
+    buildLayout('Process Efficiency vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Efficiency (%)', false, cfg),
+    PLOTLY_CONFIG);
 
   // Summary table
-  const s = d.summary;
-  const maxPct = (1 - d.PLQY / 100) * 100;
+  const s = d.summary, maxPct = (1 - d.PLQY/100)*100;
   $('summary_tbody').innerHTML = [
-    ['Φ<sub>Tnr</sub> = 0 %',            s.phi_tnr_0],
+    ['Φ<sub>Tnr</sub> = 0 %', s.phi_tnr_0],
     [`Φ<sub>Tnr</sub> = ${maxPct.toFixed(1)} %`, s.phi_tnr_max],
-  ].map(([label, r]) => `
-    <tr>
-      <td><strong>${label}</strong></td>
-      <td>${fmt(r.ks)}</td>
-      <td>${fmt(r.ksr)}</td>
-      <td>${fmt(r.ksnr)}</td>
-      <td>${fmt(r.kisc)}</td>
-      <td>${fmt(r.kt)}</td>
-      <td>${fmt(r.ktnr)}</td>
-      <td>${fmt(r.krisc)}</td>
-      <td>${r.phi_sr.toFixed(2)}</td>
-      <td>${r.phi_isc.toFixed(2)}</td>
-      <td>${r.phi_risc.toFixed(2)}</td>
-    </tr>`).join('');
+  ].map(([lbl, r]) => `<tr>
+    <td>${lbl}</td>
+    <td>${fmt(r.ks)}</td><td>${fmt(r.ksr)}</td><td>${fmt(r.ksnr)}</td><td>${fmt(r.kisc)}</td>
+    <td>${fmt(r.kt)}</td><td>${fmt(r.ktnr)}</td><td>${fmt(r.krisc)}</td>
+    <td>${r.phi_sr.toFixed(2)}</td><td>${r.phi_isc.toFixed(2)}</td><td>${r.phi_risc.toFixed(2)}</td>
+  </tr>`).join('');
   $('table_section').style.display = '';
 }
 
-// ── UI state helpers ──────────────────────────────────────────────────────────
+// ── UI helpers ────────────────────────────────────────────────────────────────
 function setLoading(on) {
   $('btn_calc').disabled = on;
   $('calc_spinner').style.display = on ? 'inline-block' : 'none';
 }
-function showError(msg) {
-  const el = $('alertBox');
-  el.textContent = msg;
-  el.style.display = '';
-}
+function showError(msg) { const e=$('alertBox'); e.textContent=msg; e.style.display=''; }
 function hideError() {
-  $('alertBox').style.display = 'none';
-  [$('inp_pf'), $('inp_df'), $('inp_phi_pf'), $('inp_phi_df'), $('inp_plqy')]
-    .forEach(el => el.classList.remove('is-invalid'));
+  $('alertBox').style.display='none';
+  [$('inp_pf'),$('inp_df'),$('inp_phi_pf'),$('inp_phi_df'),$('inp_plqy')].forEach(el=>el.classList.remove('is-invalid'));
 }
 </script>
-
 </body>
 </html>
