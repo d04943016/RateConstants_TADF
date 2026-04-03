@@ -201,6 +201,53 @@
     .phys-desc { font-size: 0.68rem; color: var(--text-muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 0.5rem; }
 
     #alertBox { display: none; }
+
+    /* ── Theory Modal ────────────────────────────────── */
+    .theory-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 600;
+      background: rgba(0,0,0,0.6); overflow-y: auto; padding: 2rem 1rem;
+    }
+    .theory-modal {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; max-width: 820px; margin: 0 auto;
+      padding: 2rem 2.5rem; position: relative;
+    }
+    .theory-modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .theory-modal h3 { font-size: 0.92rem; font-weight: 700; color: var(--accent); margin: 1.4rem 0 0.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+    .theory-modal h4 { font-size: 0.82rem; font-weight: 600; color: var(--text-label); margin: 1rem 0 0.25rem; }
+    .theory-modal p, .theory-modal li { font-size: 0.82rem; color: var(--text-label); line-height: 1.7; }
+    .theory-modal ul { padding-left: 1.2rem; }
+    .theory-modal .eq-block {
+      background: var(--bg-input); border-left: 3px solid var(--accent);
+      border-radius: 4px; padding: 0.6rem 1rem; margin: 0.5rem 0 0.8rem;
+      font-family: 'Georgia', serif; font-size: 0.85rem; color: var(--text-main);
+      overflow-x: auto;
+    }
+    .theory-modal .eq-block .eq-label {
+      float: right; font-size: 0.72rem; color: var(--text-muted); font-family: sans-serif;
+    }
+    .theory-modal .param-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1rem; font-size: 0.79rem; }
+    .theory-modal .param-table th { background: var(--bg-input); color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); text-align: left; }
+    .theory-modal .param-table td { padding: 0.35rem 0.6rem; border-bottom: 1px solid var(--border); color: var(--text-label); vertical-align: top; }
+    .theory-modal .param-table td:first-child { font-family: 'Georgia', serif; color: var(--text-sym); white-space: nowrap; }
+    .theory-modal .example-box { background: var(--bg-input); border-radius: 6px; padding: 0.75rem 1rem; margin: 0.5rem 0; font-size: 0.79rem; color: var(--text-label); }
+    .theory-modal .example-box strong { color: var(--text-main); }
+    .theory-modal .ref-list { font-size: 0.75rem; color: var(--text-muted); }
+    .theory-modal .ref-list li { margin-bottom: 0.3rem; }
+    .theory-close-btn {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; font-size: 1.3rem; cursor: pointer;
+      color: var(--text-muted); line-height: 1;
+    }
+    .theory-close-btn:hover { color: var(--text-main); }
+    .theory-btn {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      border-radius: 50%; width: 1.5rem; height: 1.5rem; font-size: 0.75rem;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      margin-left: 0.4rem; vertical-align: middle; font-weight: 700;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .theory-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body class="dark">
@@ -208,10 +255,117 @@
 <!-- ── Header ── -->
 <div class="app-header d-flex align-items-center justify-content-between">
   <div>
-    <h1>TADF Rate Constant Calculator</h1>
+    <h1>TADF Rate Constant Calculator <button class="theory-btn" onclick="openTheory()" title="Theory &amp; background">i</button></h1>
     <p>Three-level excitonic system &mdash; singlet &amp; triplet state dynamics</p>
   </div>
   <button class="theme-btn" id="btn_theme" onclick="toggleTheme()">☀ Light Mode</button>
+</div>
+
+<!-- ── Theory Modal ── -->
+<div class="theory-modal-overlay" id="theory_overlay" onclick="closeTheory(event)">
+  <div class="theory-modal" onclick="event.stopPropagation()">
+    <button class="theory-close-btn" onclick="closeTheory()">✕</button>
+
+    <h2>Theoretical Background</h2>
+    <p style="color:var(--text-muted);font-size:0.78rem;">Three-level photophysical model for TADF emitters (Wu et al. 2015–2017)</p>
+
+    <h3>1. Three-Level Kinetic Model</h3>
+    <p>A TADF emitter is described by three states: ground state S<sub>0</sub>, lowest excited singlet S<sub>1</sub>, and lowest triplet T<sub>1</sub>. Upon photoexcitation, excitons in S<sub>1</sub> can either emit prompt fluorescence (radiative decay k<sub>sr</sub>), undergo non-radiative decay (k<sub>snr</sub>), or undergo intersystem crossing to T<sub>1</sub> (k<sub>ISC</sub>). From T<sub>1</sub>, excitons can return to S<sub>1</sub> via thermally activated reverse ISC (k<sub>RISC</sub>), decay non-radiatively (k<sub>Tnr</sub>), or emit phosphorescence (k<sub>Tr</sub> ≈ 0 for efficient TADF).</p>
+
+    <div class="eq-block">
+      dS<sub>1</sub>/dt = −k<sub>s</sub> · S<sub>1</sub> + k<sub>RISC</sub> · T<sub>1</sub> + αG<br>
+      dT<sub>1</sub>/dt = k<sub>ISC</sub> · S<sub>1</sub> − k<sub>t</sub> · T<sub>1</sub> + (1−α)G<br>
+      <span style="font-size:0.75rem;color:var(--text-muted);">where k<sub>s</sub> = k<sub>sr</sub> + k<sub>snr</sub> + k<sub>ISC</sub> ,  k<sub>t</sub> = k<sub>Tr</sub> + k<sub>Tnr</sub> + k<sub>RISC</sub></span>
+    </div>
+
+    <p>The biexponential PL decay observed experimentally arises from the two eigenvalues of this coupled system:</p>
+    <div class="eq-block">
+      I(t) = B<sub>PF</sub> · exp(−t/τ<sub>PF</sub>) + B<sub>DF</sub> · exp(−t/τ<sub>DF</sub>)<br><br>
+      k<sub>PF</sub> = (k<sub>s</sub> + k<sub>t</sub> + Δ) / 2<br>
+      k<sub>DF</sub> = (k<sub>s</sub> + k<sub>t</sub> − Δ) / 2<br>
+      <span style="font-size:0.75rem;color:var(--text-muted);">Δ = √[(k<sub>s</sub> − k<sub>t</sub>)² + 4·k<sub>ISC</sub>·k<sub>RISC</sub>]</span>
+    </div>
+
+    <h3>2. Rate Constants</h3>
+    <table class="param-table">
+      <thead><tr><th>Symbol</th><th>Name</th><th>Physical meaning</th></tr></thead>
+      <tbody>
+        <tr><td>k<sub>s</sub></td><td>Total singlet rate</td><td>Total decay rate from S<sub>1</sub>; equals 1/τ<sub>PF</sub> at the fast-decay limit</td></tr>
+        <tr><td>k<sub>sr</sub></td><td>Radiative (S<sub>1</sub>)</td><td>Spontaneous emission rate constant; determines prompt fluorescence quantum yield</td></tr>
+        <tr><td>k<sub>snr</sub></td><td>Non-radiative (S<sub>1</sub>)</td><td>Internal conversion and vibrational relaxation from S<sub>1</sub></td></tr>
+        <tr><td>k<sub>ISC</sub></td><td>Intersystem crossing</td><td>S<sub>1</sub>→T<sub>1</sub> coupling; driven by spin-orbit coupling</td></tr>
+        <tr><td>k<sub>t</sub></td><td>Total triplet rate</td><td>Total decay rate from T<sub>1</sub></td></tr>
+        <tr><td>k<sub>Tnr</sub></td><td>Non-radiative (T<sub>1</sub>)</td><td>Non-radiative loss from triplet; limits TADF efficiency</td></tr>
+        <tr><td>k<sub>RISC</sub></td><td>Reverse ISC</td><td>T<sub>1</sub>→S<sub>1</sub> thermally activated upconversion; key TADF process</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3. Directly Determined Rate Constants</h3>
+    <p>From the measured (k<sub>PF</sub>, k<sub>DF</sub>, Φ<sub>PF</sub>, Φ<sub>DF</sub>), three quantities can be determined directly without any additional assumption:</p>
+    <div class="eq-block">
+      k<sub>sr</sub> = k<sub>PF</sub>·Φ<sub>PF</sub> + k<sub>DF</sub>·Φ<sub>DF</sub><br><br>
+      k<sub>s</sub> = (k<sub>PF</sub>²·Φ<sub>PF</sub> + k<sub>DF</sub>²·Φ<sub>DF</sub>) / k<sub>sr</sub><br><br>
+      k<sub>t</sub> = (Φ<sub>PF</sub> + Φ<sub>DF</sub>) · k<sub>PF</sub> · k<sub>DF</sub> / k<sub>sr</sub><br><br>
+      k<sub>ISC</sub>·k<sub>RISC</sub> = Φ<sub>PF</sub>·Φ<sub>DF</sub>·k<sub>PF</sub>·k<sub>DF</sub>·(k<sub>PF</sub>−k<sub>DF</sub>)² / k<sub>sr</sub>²
+    </div>
+
+    <h3>4. Underdetermined Rate Constants &amp; the Φ<sub>Tnr</sub> Parameter</h3>
+    <p>k<sub>ISC</sub> and k<sub>RISC</sub> individually cannot be determined from PL data alone because only their product is known. An additional parameter is needed: <strong>Φ<sub>Tnr</sub><sup>PL</sup></strong>, the fraction of excitons lost non-radiatively from T<sub>1</sub> under PL excitation (α = 1).</p>
+    <div class="eq-block">
+      k<sub>ISC</sub>(Φ<sub>Tnr</sub>) = (k<sub>ISC</sub>·k<sub>RISC</sub> + Φ<sub>Tnr</sub>·k<sub>PF</sub>·k<sub>DF</sub>) / k<sub>t</sub><br>
+      k<sub>RISC</sub>(Φ<sub>Tnr</sub>) = k<sub>ISC</sub>·k<sub>RISC</sub> / k<sub>ISC</sub><br>
+      k<sub>snr</sub>(Φ<sub>Tnr</sub>) = k<sub>s</sub> − k<sub>sr</sub> − k<sub>ISC</sub><br>
+      k<sub>Tnr</sub>(Φ<sub>Tnr</sub>) = k<sub>t</sub> − k<sub>RISC</sub>
+    </div>
+    <p>The calculator sweeps Φ<sub>Tnr</sub><sup>PL</sup> from 0 to its maximum physical value (= 1 − PLQY), tracing how all rate constants and efficiencies depend on this unknown parameter. The true operating point lies somewhere along this curve.</p>
+
+    <h3>5. Efficiency Definitions</h3>
+    <div class="eq-block">
+      Φ<sub>sr</sub> = k<sub>sr</sub> / k<sub>s</sub> &nbsp;&nbsp;&nbsp; (radiative yield from S<sub>1</sub>)<br>
+      Φ<sub>snr</sub> = k<sub>snr</sub> / k<sub>s</sub> &nbsp;&nbsp; (non-radiative loss from S<sub>1</sub>)<br>
+      Φ<sub>ISC</sub> = k<sub>ISC</sub> / k<sub>s</sub> &nbsp;&nbsp; (ISC efficiency)<br>
+      Φ<sub>RISC</sub> = k<sub>RISC</sub> / k<sub>t</sub> &nbsp; (RISC efficiency)<br>
+      Φ<sub>Tnr</sub> = k<sub>Tnr</sub> / k<sub>t</sub> &nbsp;&nbsp; (triplet non-radiative loss)<br><br>
+      PLQY = Φ<sub>sr</sub> / (1 − Φ<sub>ISC</sub>·Φ<sub>RISC</sub>)
+    </div>
+
+    <h3>6. Worked Example</h3>
+    <p>Using default parameters: τ<sub>PF</sub> = 15 ns, τ<sub>DF</sub> = 2.9 µs, Φ<sub>PF</sub> = 70%, Φ<sub>DF</sub> = 12%, PLQY = 82%</p>
+    <div class="example-box">
+      <strong>Inputs:</strong><br>
+      k<sub>PF</sub> = 1/15 ns = 6.67×10<sup>7</sup> s<sup>−1</sup><br>
+      k<sub>DF</sub> = 1/2.9 µs = 3.45×10<sup>5</sup> s<sup>−1</sup><br>
+      Φ<sub>PF</sub> = 0.70, Φ<sub>DF</sub> = 0.12<br><br>
+      <strong>Directly determined:</strong><br>
+      k<sub>sr</sub> = 6.67×10<sup>7</sup>×0.70 + 3.45×10<sup>5</sup>×0.12 ≈ 4.67×10<sup>7</sup> s<sup>−1</sup><br>
+      k<sub>s</sub> ≈ 6.66×10<sup>7</sup> s<sup>−1</sup> (≈ k<sub>PF</sub> since k<sub>PF</sub> ≫ k<sub>DF</sub>)<br>
+      k<sub>t</sub> ≈ 4.04×10<sup>5</sup> s<sup>−1</sup><br><br>
+      <strong>At Φ<sub>Tnr</sub> = 0 (best case):</strong><br>
+      k<sub>ISC</sub> ≈ 9.65×10<sup>6</sup> s<sup>−1</sup>, k<sub>RISC</sub> ≈ 4.04×10<sup>5</sup> s<sup>−1</sup><br>
+      k<sub>snr</sub> ≈ 1.02×10<sup>7</sup> s<sup>−1</sup>, k<sub>Tnr</sub> ≈ 0<br><br>
+      <strong>At Φ<sub>Tnr</sub> = 18% (worst case, = 1−PLQY):</strong><br>
+      k<sub>ISC</sub> and k<sub>RISC</sub> both decrease; k<sub>Tnr</sub> increases<br>
+      → Efficiency Φ<sub>RISC</sub> drops significantly
+    </div>
+
+    <h3>7. Input Modes</h3>
+    <h4>Lifetime mode (τ)</h4>
+    <p>Enter τ<sub>PF</sub> in nanoseconds and τ<sub>DF</sub> in microseconds. The calculator converts via k = 1/τ. Requires quantum yield inputs Φ<sub>PF</sub>, Φ<sub>DF</sub> as percentages (sum ≤ 100%).</p>
+    <h4>Rate constant mode (k)</h4>
+    <p>Enter k<sub>PF</sub> directly in units of 10<sup>8</sup> s<sup>−1</sup> and k<sub>DF</sub> in 10<sup>5</sup> s<sup>−1</sup>.</p>
+    <h4>B-prefactor mode</h4>
+    <p>Use when fitting the decay curve as I(t) = B<sub>PF</sub>·exp(−t/τ<sub>PF</sub>) + B<sub>DF</sub>·exp(−t/τ<sub>DF</sub>). Enter B<sub>PF</sub>, B<sub>DF</sub>, and total PLQY; the calculator converts to Φ<sub>PF</sub>, Φ<sub>DF</sub> via weighted integration:
+    Φ<sub>i</sub> = PLQY × (B<sub>i</sub>·τ<sub>i</sub>) / (B<sub>PF</sub>·τ<sub>PF</sub> + B<sub>DF</sub>·τ<sub>DF</sub>).</p>
+
+    <h3>8. References</h3>
+    <ol class="ref-list">
+      <li>C.-C. Wu et al., <em>Adv. Funct. Mater.</em> <strong>2015</strong>, DPAC-based TADF emitters. (Supplementary: rate constant derivation)</li>
+      <li>C.-C. Wu et al., <em>Adv. Funct. Mater.</em> <strong>2016</strong>, CN-substituted pyridine/pyrimidine acceptors. (SI: full analytical derivation of k<sub>ISC</sub>, k<sub>RISC</sub>)</li>
+      <li>C.-C. Wu et al., <em>ACS Photonics</em> <strong>2016</strong>, Spiroacridine-triazine; 37% EQE sky-blue OLED.</li>
+      <li>C.-C. Wu et al., <em>Adv. Funct. Mater.</em> <strong>2017</strong>, Naphthalimide-acridine hybrids; ~30% EQE orange-red OLED.</li>
+    </ol>
+
+  </div>
 </div>
 
 <div class="container-fluid p-0">
@@ -797,6 +951,12 @@ function renderResults(d) {
     <td>${r.phi_sr.toFixed(2)}</td><td>${r.phi_isc.toFixed(2)}</td><td>${r.phi_risc.toFixed(2)}</td>
   </tr>`).join('');
   $('table_section').style.display = '';
+}
+
+// ── Theory modal ──────────────────────────────────────────────────────────────
+function openTheory() { $('theory_overlay').style.display = 'block'; }
+function closeTheory(e) {
+  if (!e || e.target === $('theory_overlay')) $('theory_overlay').style.display = 'none';
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
