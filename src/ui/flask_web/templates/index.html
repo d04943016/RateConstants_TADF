@@ -184,17 +184,21 @@
     .chart-wrapper {
       background: var(--bg-card); border: 1px solid var(--border);
       border-radius: 8px; padding: 0.5rem;
-      margin-bottom: 0.5rem; min-height: 360px;
-      display: flex; flex-direction: column; justify-content: center;
+      margin-bottom: 0.5rem;
     }
-    #chart_rc, #chart_qy { min-height: 360px; }
-    .placeholder-msg {
+    #chart_rc, #chart_qy { aspect-ratio: 4/3; width: 100%; }
+    .pre-calc-placeholder {
       display: flex; align-items: center; justify-content: center;
-      height: 320px; color: var(--text-muted);
-      font-size: 0.85rem; flex-direction: column; gap: 0.5rem;
+      padding: 3rem; color: var(--text-muted);
+      font-size: 0.85rem; gap: 2rem; flex-wrap: wrap;
+    }
+    .pre-calc-placeholder .ph-item {
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
     }
     .placeholder-icon { font-size: 2rem; opacity: 0.3; }
     .chart-btns { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.25rem; margin-bottom: 0.75rem; }
+    /* ── Physical description ────────────────────────── */
+    .phys-desc { font-size: 0.68rem; color: var(--text-muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 0.5rem; }
 
     #alertBox { display: none; }
   </style>
@@ -285,42 +289,6 @@
         <input type="text" id="inp_fname" class="form-control form-control-sm mb-2" value="results" placeholder="results" />
       </div>
 
-      <!-- Chart Settings -->
-      <div class="mb-3">
-        <div class="section-label settings-toggle" id="settings_toggle" onclick="toggleSettings()">
-          <span>Chart Settings</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="settings-panel" id="settings_panel">
-          <div class="sld-row">
-            <label>Line Width <span id="lw_val">2.5</span> px</label>
-            <input type="range" id="sld_lw" min="1" max="5" step="0.5" value="2.5" oninput="onSettingChange()">
-          </div>
-          <div class="sld-row">
-            <label>Marker Size <span id="ms_val">8</span> px</label>
-            <input type="range" id="sld_ms" min="4" max="16" step="1" value="8" oninput="onSettingChange()">
-          </div>
-          <div class="sld-row">
-            <label>Marker Every <span id="mi_val">20</span> pts</label>
-            <input type="range" id="sld_mi" min="5" max="50" step="5" value="20" oninput="onSettingChange()">
-          </div>
-          <div class="sld-row">
-            <label>Font Size <span id="fs_val">13</span> pt</label>
-            <input type="range" id="sld_fs" min="9" max="20" step="1" value="13" oninput="onSettingChange()">
-          </div>
-          <div class="sld-row">
-            <label>Export Resolution <span id="er_val">1600</span> px wide</label>
-            <input type="range" id="sld_er" min="800" max="3200" step="400" value="1600" oninput="onSettingChange()">
-          </div>
-          <div class="form-check pub-check mt-1">
-            <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
-            <label class="form-check-label" for="chk_pub">
-              Publication Mode (white background)
-            </label>
-          </div>
-        </div>
-      </div>
-
       <!-- Actions -->
       <button id="btn_calc" class="btn btn-calculate mb-2">
         <span id="calc_spinner" class="spinner-border me-2" role="status" style="display:none;"></span>
@@ -337,26 +305,169 @@
       <div id="summary_bar" class="result-card" style="display:none;">
         <div class="result-card-title">Input Summary</div>
         <div class="kv-grid">
-          <div class="kv-item"><span class="kv-key">k<sub>PF</sub></span><span class="kv-val" id="sv_kPF">—</span></div>
-          <div class="kv-item"><span class="kv-key">k<sub>DF</sub></span><span class="kv-val" id="sv_kDF">—</span></div>
-          <div class="kv-item"><span class="kv-key">Φ<sub>PF</sub></span><span class="kv-val" id="sv_PhiPF">—</span></div>
-          <div class="kv-item"><span class="kv-key">Φ<sub>DF</sub></span><span class="kv-val" id="sv_PhiDF">—</span></div>
-          <div class="kv-item"><span class="kv-key">PLQY</span><span class="kv-val" id="sv_PLQY">—</span></div>
+          <div class="kv-item">
+            <span class="kv-key">k<sub>PF</sub></span>
+            <span class="kv-val" id="sv_kPF">—</span>
+          </div>
+          <div class="kv-item">
+            <span class="kv-key">k<sub>DF</sub></span>
+            <span class="kv-val" id="sv_kDF">—</span>
+          </div>
+          <div class="kv-item">
+            <span class="kv-key">Φ<sub>PF</sub></span>
+            <span class="kv-val" id="sv_PhiPF">—</span>
+          </div>
+          <div class="kv-item">
+            <span class="kv-key">Φ<sub>DF</sub></span>
+            <span class="kv-val" id="sv_PhiDF">—</span>
+          </div>
+          <div class="kv-item">
+            <span class="kv-key">PLQY</span>
+            <span class="kv-val" id="sv_PLQY">—</span>
+          </div>
+        </div>
+        <div class="phys-desc mt-2">
+          <span class="phys-item"><b>k<sub>PF</sub></b> — Prompt fluorescence rate (= 1/τ<sub>PF</sub>); total singlet decay rate k<sub>s</sub> = k<sub>sr</sub> + k<sub>snr</sub> + k<sub>ISC</sub></span><br>
+          <span class="phys-item"><b>k<sub>DF</sub></b> — Delayed fluorescence rate (= 1/τ<sub>DF</sub>); related to triplet decay and RISC efficiency</span><br>
+          <span class="phys-item"><b>Φ<sub>PF</sub></b> — Prompt fluorescence quantum yield; fraction of PLQY from S₁ direct emission</span><br>
+          <span class="phys-item"><b>Φ<sub>DF</sub></b> — Delayed fluorescence quantum yield; fraction of PLQY harvested via T₁→S₁ RISC</span><br>
+          <span class="phys-item"><b>PLQY</b> — Total photoluminescence quantum yield = Φ<sub>PF</sub> + Φ<sub>DF</sub></span>
         </div>
       </div>
 
-      <div class="row g-3">
-        <!-- Chart 1 -->
-        <div class="col-12 col-xl-6">
-          <div class="chart-wrapper">
-            <div id="chart_rc">
-              <div class="placeholder-msg">
-                <span class="placeholder-icon">📊</span>
-                <span>Enter parameters and click <strong>Calculate</strong></span>
+      <!-- Chart Settings trigger button -->
+      <div class="d-flex justify-content-end mb-2">
+        <button class="btn btn-download btn-sm" onclick="toggleSettings()">⚙ Chart Settings</button>
+      </div>
+
+      <!-- Floating Chart Settings Panel -->
+      <div id="settings_overlay" onclick="closeSettings()" style="display:none;position:fixed;inset:0;z-index:498;background:rgba(0,0,0,0.35);"></div>
+      <div id="settings_panel_float" style="display:none;position:fixed;top:60px;right:0;width:380px;max-height:calc(100vh - 70px);overflow-y:auto;z-index:499;background:var(--bg-card);border-left:1px solid var(--border);border-bottom:1px solid var(--border);border-radius:0 0 0 8px;padding:1rem;box-shadow:-4px 4px 20px var(--shadow);">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="section-label" style="margin:0;border:none;padding:0;">Chart Settings</span>
+          <button onclick="closeSettings()" style="background:none;border:none;font-size:1.1rem;color:var(--text-muted);cursor:pointer;padding:0;">✕</button>
+        </div>
+        <div class="settings-panel" id="settings_panel">
+          <!-- Row 1: Line / Marker -->
+          <div class="row g-2 mt-1">
+            <div class="col-sm-4">
+              <div class="sld-row">
+                <label>Line Width <span id="lw_val">2.5</span> px</label>
+                <input type="range" id="sld_lw" min="1" max="5" step="0.5" value="2.5" oninput="onSettingChange()">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="sld-row">
+                <label>Marker Size <span id="ms_val">8</span> px</label>
+                <input type="range" id="sld_ms" min="4" max="16" step="1" value="8" oninput="onSettingChange()">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="sld-row">
+                <label>Marker Every <span id="mi_val">20</span> pts</label>
+                <input type="range" id="sld_mi" min="5" max="50" step="5" value="20" oninput="onSettingChange()">
               </div>
             </div>
           </div>
-          <div class="chart-btns" id="dl_rc_row" style="display:none;">
+          <!-- Row 2: Font sizes -->
+          <div class="row g-2">
+            <div class="col-sm-3">
+              <div class="sld-row">
+                <label>Title <span id="fs_title_val">14</span> pt</label>
+                <input type="range" id="sld_fs_title" min="8" max="24" step="1" value="14" oninput="onSettingChange()">
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="sld-row">
+                <label>Axis Label <span id="fs_axis_val">12</span> pt</label>
+                <input type="range" id="sld_fs_axis" min="8" max="22" step="1" value="12" oninput="onSettingChange()">
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="sld-row">
+                <label>Tick <span id="fs_tick_val">11</span> pt</label>
+                <input type="range" id="sld_fs_tick" min="7" max="20" step="1" value="11" oninput="onSettingChange()">
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="sld-row">
+                <label>Legend <span id="fs_leg_val">11</span> pt</label>
+                <input type="range" id="sld_fs_leg" min="7" max="20" step="1" value="11" oninput="onSettingChange()">
+              </div>
+            </div>
+          </div>
+          <!-- Row 3: Axis ranges -->
+          <div class="row g-2 align-items-end">
+            <div class="col-sm-3">
+              <label class="sld-row" style="font-size:0.72rem;color:var(--text-label);display:flex;justify-content:space-between;margin-bottom:0.15rem;">
+                <span>X min</span>
+              </label>
+              <input type="number" id="inp_xmin" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+            </div>
+            <div class="col-sm-3">
+              <label class="sld-row" style="font-size:0.72rem;color:var(--text-label);display:flex;justify-content:space-between;margin-bottom:0.15rem;">
+                <span>X max</span>
+              </label>
+              <input type="number" id="inp_xmax" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+            </div>
+            <div class="col-sm-3">
+              <label class="sld-row" style="font-size:0.72rem;color:var(--text-label);display:flex;justify-content:space-between;margin-bottom:0.15rem;">
+                <span>Y min (Rate Const.)</span>
+              </label>
+              <input type="number" id="inp_ymin_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+            </div>
+            <div class="col-sm-3">
+              <label class="sld-row" style="font-size:0.72rem;color:var(--text-label);display:flex;justify-content:space-between;margin-bottom:0.15rem;">
+                <span>Y max (Rate Const.)</span>
+              </label>
+              <input type="number" id="inp_ymax_rc" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+            </div>
+          </div>
+          <div class="sld-row mt-1">
+            <label>Y min (Efficiency)</label>
+            <input type="number" id="inp_ymin_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+          </div>
+          <div class="sld-row">
+            <label>Y max (Efficiency)</label>
+            <input type="number" id="inp_ymax_qy" class="form-control form-control-sm" placeholder="auto" step="any" oninput="onSettingChange()">
+          </div>
+          <hr style="border-color:var(--border);margin:0.5rem 0;">
+          <div class="sld-row">
+            <label>Export <span id="er_val">1600</span> px wide</label>
+            <input type="range" id="sld_er" min="800" max="3200" step="400" value="1600" oninput="onSettingChange()">
+          </div>
+          <div class="form-check pub-check mt-1">
+            <input class="form-check-input" type="checkbox" id="chk_pub" onchange="onSettingChange()">
+            <label class="form-check-label" for="chk_pub">Publication Mode (white background)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pre-calculate placeholder -->
+      <div id="pre_calc_msg" class="result-card">
+        <div class="pre-calc-placeholder">
+          <div class="ph-item">
+            <span class="placeholder-icon">📊</span>
+            <span>Rate constants will appear here</span>
+          </div>
+          <div class="ph-item">
+            <span class="placeholder-icon">📈</span>
+            <span>Process efficiency will appear here</span>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:0.78rem;color:var(--text-muted);padding-bottom:1rem;">
+          Enter parameters on the left and click <strong>Calculate</strong>
+        </div>
+      </div>
+
+      <!-- Charts (hidden until first calculate) -->
+      <div id="charts_row" class="row g-3" style="display:none;">
+        <!-- Chart 1 -->
+        <div class="col-12 col-xl-6">
+          <div class="chart-wrapper">
+            <div id="chart_rc"></div>
+          </div>
+          <div class="chart-btns" id="dl_rc_row">
             <button class="btn btn-download btn-sm" onclick="downloadChart('chart_rc','rate_constants')">↓ PNG</button>
             <button class="btn btn-download btn-sm" onclick="downloadChart('chart_rc','rate_constants','svg')">↓ SVG</button>
           </div>
@@ -364,14 +475,9 @@
         <!-- Chart 2 -->
         <div class="col-12 col-xl-6">
           <div class="chart-wrapper">
-            <div id="chart_qy">
-              <div class="placeholder-msg">
-                <span class="placeholder-icon">📈</span>
-                <span>Results will appear here</span>
-              </div>
-            </div>
+            <div id="chart_qy"></div>
           </div>
-          <div class="chart-btns" id="dl_qy_row" style="display:none;">
+          <div class="chart-btns" id="dl_qy_row">
             <button class="btn btn-download btn-sm" onclick="downloadChart('chart_qy','process_efficiency')">↓ PNG</button>
             <button class="btn btn-download btn-sm" onclick="downloadChart('chart_qy','process_efficiency','svg')">↓ SVG</button>
           </div>
@@ -424,30 +530,45 @@ function toggleTheme() {
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
-let _settingsOpen = true;
+let _settingsOpen = false;
 function toggleSettings() {
   _settingsOpen = !_settingsOpen;
-  $('settings_panel').style.display = _settingsOpen ? '' : 'none';
-  $('settings_toggle').classList.toggle('collapsed', !_settingsOpen);
+  $('settings_panel_float').style.display = _settingsOpen ? '' : 'none';
+  $('settings_overlay').style.display     = _settingsOpen ? '' : 'none';
+}
+function closeSettings() {
+  _settingsOpen = false;
+  $('settings_panel_float').style.display = 'none';
+  $('settings_overlay').style.display     = 'none';
 }
 
 function getSettings() {
+  const parseNum = (id) => { const v = parseFloat($(id)?.value); return isNaN(v) ? null : v; };
   return {
     lineWidth:   parseFloat($('sld_lw').value),
     markerSize:  parseInt($('sld_ms').value),
     markerEvery: parseInt($('sld_mi').value),
-    fontSize:    parseInt($('sld_fs').value),
+    fsTitle:     parseInt($('sld_fs_title').value),
+    fsAxis:      parseInt($('sld_fs_axis').value),
+    fsTick:      parseInt($('sld_fs_tick').value),
+    fsLeg:       parseInt($('sld_fs_leg').value),
     exportWidth: parseInt($('sld_er').value),
     pubMode:     $('chk_pub').checked,
+    xMin: parseNum('inp_xmin'), xMax: parseNum('inp_xmax'),
+    yMinRC: parseNum('inp_ymin_rc'), yMaxRC: parseNum('inp_ymax_rc'),
+    yMinQY: parseNum('inp_ymin_qy'), yMaxQY: parseNum('inp_ymax_qy'),
   };
 }
 
 function onSettingChange() {
-  $('lw_val').textContent = $('sld_lw').value;
-  $('ms_val').textContent = $('sld_ms').value;
-  $('mi_val').textContent = $('sld_mi').value;
-  $('fs_val').textContent = $('sld_fs').value;
-  $('er_val').textContent = $('sld_er').value;
+  $('lw_val').textContent       = $('sld_lw').value;
+  $('ms_val').textContent       = $('sld_ms').value;
+  $('mi_val').textContent       = $('sld_mi').value;
+  $('fs_title_val').textContent = $('sld_fs_title').value;
+  $('fs_axis_val').textContent  = $('sld_fs_axis').value;
+  $('fs_tick_val').textContent  = $('sld_fs_tick').value;
+  $('fs_leg_val').textContent   = $('sld_fs_leg').value;
+  $('er_val').textContent       = $('sld_er').value;
   if (_lastData) renderResults(_lastData);
 }
 
@@ -487,60 +608,57 @@ function buildTraces(defs, dataObj, xArr, cfg) {
     name: def.name,
     type: 'scatter',
     mode: 'lines+markers',
-    line: {
-      color: def[colorKey],
-      width: lineWidth,
-      dash: def.dash,
-    },
+    line:   { color: def[colorKey], width: lineWidth, dash: def.dash },
     marker: {
-      symbol: def.sym,
-      size: markerSize,
-      color: def[colorKey],
-      opacity: opacity,
+      symbol: def.sym, size: markerSize, color: def[colorKey], opacity,
       line: { width: def.sym.includes('open') ? Math.max(1.5, lineWidth * 0.6) : 0, color: def[colorKey] },
     },
   }));
 }
 
-function buildLayout(titleText, yTitle, isLog, cfg) {
-  const { fontSize, pubMode } = cfg;
-  const paperBg  = pubMode ? 'white' : 'rgba(0,0,0,0)';
-  const plotBg   = pubMode ? 'white' : 'rgba(0,0,0,0)';
-  const gridC    = pubMode ? '#cccccc' : (currentTheme === 'dark' ? '#2e3250' : '#d8daea');
-  const textC    = pubMode ? '#111111' : (currentTheme === 'dark' ? '#b0b4cc' : '#3a3e58');
-  const titleC   = pubMode ? '#000000' : (currentTheme === 'dark' ? '#e4e6f0' : '#1a1d27');
-  const zeroC    = pubMode ? '#999999' : gridC;
-  const legendBg = pubMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0)';
-  const legendBorder = pubMode ? '#cccccc' : 'rgba(0,0,0,0)';
+function buildLayout(titleText, yTitle, isLog, cfg, yRange) {
+  const { fsTitle, fsAxis, fsTick, fsLeg, pubMode, xMin, xMax } = cfg;
+  const paperBg     = pubMode ? 'white' : 'rgba(0,0,0,0)';
+  const plotBg      = pubMode ? 'white' : 'rgba(0,0,0,0)';
+  const gridC       = pubMode ? '#cccccc' : (currentTheme === 'dark' ? '#2e3250' : '#d8daea');
+  const textC       = pubMode ? '#111111' : (currentTheme === 'dark' ? '#b0b4cc' : '#3a3e58');
+  const titleC      = pubMode ? '#000000' : (currentTheme === 'dark' ? '#e4e6f0' : '#1a1d27');
+  const zeroC       = pubMode ? '#999999' : gridC;
+  const legendBg    = pubMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0)';
+  const legendBorder= pubMode ? '#cccccc' : 'rgba(0,0,0,0)';
+
+  const xaxis = {
+    title: { text: 'Φ<sub>Tnr</sub><sup>PL</sup> (%)', font: { size: fsAxis } },
+    gridcolor: gridC, zerolinecolor: zeroC, color: textC,
+    linecolor: textC, mirror: true, tickfont: { size: fsTick },
+  };
+  if (xMin !== null) xaxis.range = [xMin, xMax !== null ? xMax : undefined];
+  else if (xMax !== null) xaxis.range = [undefined, xMax];
+
+  const yaxis = {
+    title: { text: yTitle, font: { size: fsAxis } },
+    type: isLog ? 'log' : 'linear', exponentformat: 'e',
+    gridcolor: gridC, zerolinecolor: zeroC, color: textC,
+    linecolor: textC, mirror: true, tickfont: { size: fsTick },
+  };
+  if (yRange && (yRange[0] !== null || yRange[1] !== null)) {
+    yaxis.range = [
+      isLog && yRange[0] !== null ? Math.log10(yRange[0]) : yRange[0],
+      isLog && yRange[1] !== null ? Math.log10(yRange[1]) : yRange[1],
+    ];
+  }
 
   return {
-    paper_bgcolor: paperBg,
-    plot_bgcolor:  plotBg,
-    font: { color: textC, size: fontSize },
-    title: { text: titleText, font: { size: fontSize + 2, color: titleC }, pad: { t: 4 } },
-    xaxis: {
-      title: { text: 'Φ<sub>Tnr</sub><sup>PL</sup> (%)', font: { size: fontSize } },
-      gridcolor: gridC, zerolinecolor: zeroC, color: textC,
-      linecolor: textC, mirror: true,
-      tickfont: { size: fontSize - 1 },
-    },
-    yaxis: {
-      title: { text: yTitle, font: { size: fontSize } },
-      type: isLog ? 'log' : 'linear',
-      exponentformat: 'e',
-      gridcolor: gridC, zerolinecolor: zeroC, color: textC,
-      linecolor: textC, mirror: true,
-      tickfont: { size: fontSize - 1 },
-    },
+    paper_bgcolor: paperBg, plot_bgcolor: plotBg,
+    font: { color: textC, size: fsTick },
+    title: { text: titleText, font: { size: fsTitle, color: titleC }, pad: { t: 4 } },
+    xaxis, yaxis,
     legend: {
-      orientation: 'h', x: 0, y: -0.25,
-      bgcolor: legendBg,
+      orientation: 'h', x: 0, y: -0.25, bgcolor: legendBg,
       bordercolor: legendBorder, borderwidth: pubMode ? 1 : 0,
-      font: { size: fontSize - 1, color: textC },
-      traceorder: 'normal',
+      font: { size: fsLeg, color: textC }, traceorder: 'normal',
     },
     margin: { t: 50, b: 90, l: 70, r: 20 },
-    height: 360,
   };
 }
 
@@ -591,8 +709,6 @@ $('btn_calc').addEventListener('click', async () => {
     _lastData = json.data;
     renderResults(_lastData);
     $('btn_dl').disabled = false;
-    $('dl_rc_row').style.display = 'flex';
-    $('dl_qy_row').style.display = 'flex';
   } catch(err) { showError(err.message); }
   finally { setLoading(false); }
 });
@@ -616,7 +732,7 @@ $('btn_dl').addEventListener('click', async () => {
 function downloadChart(divId, suffix, format='png') {
   const cfg   = getSettings();
   const fname = ($('inp_fname').value.trim() || 'results') + '_' + suffix;
-  const h     = Math.round(cfg.exportWidth * 0.55);
+  const h     = Math.round(cfg.exportWidth * 0.75);  // 4:3
   Plotly.downloadImage(divId, { format, width: cfg.exportWidth, height: h, filename: fname });
 }
 
@@ -641,9 +757,13 @@ function renderResults(d) {
   Plotly.purge('chart_rc');
   Plotly.purge('chart_qy');
 
+  // Show charts, hide placeholder
+  $('pre_calc_msg').style.display = 'none';
+  $('charts_row').style.display   = '';
+
   // Summary bar
-  $('sv_kPF').textContent  = fmt(d.kPF) + ' /s';
-  $('sv_kDF').textContent  = fmt(d.kDF) + ' /s';
+  $('sv_kPF').textContent   = fmt(d.kPF) + ' /s';
+  $('sv_kDF').textContent   = fmt(d.kDF) + ' /s';
   $('sv_PhiPF').textContent = d.Phi_PF.toFixed(2) + ' %';
   $('sv_PhiDF').textContent = d.Phi_DF.toFixed(2) + ' %';
   $('sv_PLQY').textContent  = d.PLQY.toFixed(2) + ' %';
@@ -654,13 +774,15 @@ function renderResults(d) {
   // Chart 1 — Rate constants
   Plotly.react('chart_rc',
     buildTraces(RC_DEFS, d.rate_constants, d.x, cfg),
-    buildLayout('Rate Constants vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Rate Constant (s⁻¹)', true, cfg),
+    buildLayout('Rate Constants vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Rate Constant (s⁻¹)', true, cfg,
+                [cfg.yMinRC, cfg.yMaxRC]),
     PLOTLY_CONFIG);
 
   // Chart 2 — Quantum yields
   Plotly.react('chart_qy',
     buildTraces(QY_DEFS, d.quantum_yields, d.x, cfg),
-    buildLayout('Process Efficiency vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Efficiency (%)', false, cfg),
+    buildLayout('Process Efficiency vs Φ<sup>PL</sup><sub>Tnr</sub>', 'Efficiency (%)', false, cfg,
+                [cfg.yMinQY, cfg.yMaxQY]),
     PLOTLY_CONFIG);
 
   // Summary table
