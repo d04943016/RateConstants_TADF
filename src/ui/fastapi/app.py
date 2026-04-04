@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import json
@@ -66,7 +67,13 @@ class ScriptInput(BaseModel):
     fname: Optional[str] = None
 
 
+_TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+
 @app.get("/")
+def serve_ui():
+    return FileResponse(os.path.join(_TEMPLATE_DIR, 'index.html'))
+
+@app.get("/api")
 def read_root():
     return {"message": "Welcome to the TADF Rate Constants Calculator API"}
 
