@@ -6,24 +6,65 @@ import io
 import json
 import os
 import sys
+import time
+import threading
 import numpy as np
 from flask import Flask, render_template, request, jsonify, send_file
 
+# ── Path resolution (works both in dev and PyInstaller bundle) ─────────────────
+def _resolve_base():
+    """Return base directory for bundled resources."""
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS  # PyInstaller temp dir
+    return os.path.dirname(os.path.abspath(__file__))
+
+_BASE = _resolve_base()
+
 # Resolve project root (4 levels up from src/ui/flask_web/)
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+if getattr(sys, 'frozen', False):
+    ROOT = os.path.dirname(sys.executable)  # .app/Contents/MacOS/
+else:
+    ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
-from src.engine import calculator as engine
+
+if getattr(sys, 'frozen', False):
+    sys.path.insert(0, _BASE)
+    from src.engine import calculator as engine
+else:
+    from src.engine import calculator as engine
 
 # Load config
-_CFG_PATH = os.path.join(os.path.dirname(__file__), 'config', 'config.json')
+_CFG_PATH = os.path.join(_BASE, 'config', 'config.json')
 with open(_CFG_PATH) as _f:
     _CFG = json.load(_f)
 
 OUTPUT_DIR = os.path.join(ROOT, _CFG.get('output_dir', 'data/output'))
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-app = Flask(__name__, template_folder='templates')
+_TEMPLATE_DIR = os.path.join(_BASE, 'templates')
+app = Flask(__name__, template_folder=_TEMPLATE_DIR)
+
+# ── Heartbeat: auto-shutdown when browser closes ──────────────────────────────
+_last_heartbeat = time.time()
+_HEARTBEAT_TIMEOUT = 10  # seconds without heartbeat before shutdown
+
+
+def _watchdog():
+    """Background thread: shutdown server if no heartbeat received."""
+    while True:
+        time.sleep(3)
+        if time.time() - _last_heartbeat > _HEARTBEAT_TIMEOUT:
+            print('\n[TADF] No browser heartbeat — shutting down server.')
+            os._exit(0)
+
+
+@app.route('/api/heartbeat', methods=['POST'])
+def heartbeat():
+    global _last_heartbeat
+    _last_heartbeat = time.time()
+    return '', 204
 
 
 @app.route('/')
@@ -195,4 +236,34 @@ def _run_calculation(tau_PF, tau_DF, Phi_PF, Phi_DF, n_points=200):
 
 
 if __name__ == '__main__':
-    app.run(debug=_CFG.get('debug', True), host=_CFG.get('host', '0.0.0.0'), port=_CFG.get('port', 5000))
+    import webbrowser
+
+    host = _CFG.get('host', '0.0.0.0')
+    port = _CFG.get('port', 5000)
+    debug = _CFG.get('debug', True)
+    auto_open = _CFG.get('auto_open', True)
+
+    # Frozen bundle: disable debug + reloader (Werkzeug reloader spawns subprocesses
+    # that confuse macOS windowed mode, causing "not responding" dialog)
+    if getattr(sys, 'frozen', False):
+        debug = False
+
+    # Start watchdog (only when not in reloader child process)
+    if auto_open and os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
+        threading.Thread(target=_watchdog, daemon=True).start()
+        # Poll until server is ready, then open browser
+        def _open_browser():
+            import urllib.request
+            browse_host = '127.0.0.1' if host == '0.0.0.0' else host
+            url = f'http://{browse_host}:{port}/'
+            for _ in range(30):   # up to ~6 seconds
+                try:
+                    urllib.request.urlopen(url, timeout=0.5)
+                    break
+                except Exception:
+                    time.sleep(0.2)
+            webbrowser.open(url)
+        threading.Thread(target=_open_browser, daemon=True).start()
+
+    app.run(debug=debug, host=host, port=port,
+            use_reloader=False if getattr(sys, 'frozen', False) else debug)

@@ -1,0 +1,118 @@
+<svg viewBox="0 0 760 450" style="width:100%;display:block;font-family:'Segoe UI',system-ui,sans-serif;background:#ffffff;" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="gArrowB"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#4f8ef7"/></marker>
+    <marker id="gArrowO"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#f7874f"/></marker>
+    <marker id="gArrowR"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#f74f6a"/></marker>
+    <marker id="gArrowG"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#4caf88"/></marker>
+    <marker id="gArrowGray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#888"/></marker>
+  </defs>
+
+  <!-- Panel backgrounds -->
+  <rect x="2" y="2" width="370" height="446" rx="8" style="fill:#f5f5f7;opacity:0.7"/>
+  <rect x="390" y="2" width="368" height="446" rx="8" style="fill:#f5f5f7;opacity:0.7"/>
+
+  <!-- ═══ SHAPES FIRST ═══ -->
+
+  <!-- LEFT axes -->
+  <line x1="78" y1="58" x2="78" y2="332" style="stroke:#cccccc;stroke-width:1.5"/>
+  <line x1="78" y1="332" x2="352" y2="332" style="stroke:#cccccc;stroke-width:1.5"/>
+  <polygon points="78,54 74,62 82,62" style="fill:#cccccc"/>
+  <polygon points="356,332 348,328 348,336" style="fill:#cccccc"/>
+
+  <!-- Φ_DF shaded area (orange) -->
+  <path d="M78,214 L352,320 L352,332 L78,332 Z" style="fill:rgba(247,135,79,0.22)"/>
+  <!-- Φ_PF shaded area (green) -->
+  <path d="M78,70 L215,332 L78,332 Z" style="fill:rgba(76,175,136,0.25)"/>
+
+  <!-- Slow (DF) dashed component -->
+  <line x1="78" y1="214" x2="352" y2="320" style="stroke:#f7874f;stroke-width:2;stroke-dasharray:7,3"/>
+  <!-- Fast (PF) dashed component -->
+  <line x1="78" y1="70" x2="215" y2="332" style="stroke:#4caf88;stroke-width:2;stroke-dasharray:7,3"/>
+  <!-- Main biexponential (blue) -->
+  <polyline points="78,70 83,82 88,88 94,104 100,111 107,129 114,135 121,155 129,164 137,186 146,197 155,221 163,229 170,249 172,247 175,255 180,250 187,261 195,255 205,268 216,263 228,277 241,272 255,288 269,283 284,300 298,294 313,311 327,304 340,320 352,316" style="fill:none;stroke:#4f8ef7;stroke-width:2"/>
+
+  <!-- Y-axis ticks -->
+  <line x1="72" y1="70"  x2="81" y2="70"  style="stroke:#4caf88;stroke-width:1.5"/>
+  <line x1="72" y1="214" x2="81" y2="214" style="stroke:#f7874f;stroke-width:1.5"/>
+
+  <!-- Slope triangle PF -->
+  <line x1="105" y1="122" x2="145" y2="122" style="stroke:#4caf88;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+  <line x1="145" y1="122" x2="145" y2="198" style="stroke:#4caf88;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+  <path d="M141,122 L141,126 L145,126" style="fill:none;stroke:#4caf88;stroke-width:1;opacity:0.8"/>
+
+  <!-- Slope triangle DF -->
+  <line x1="160" y1="246" x2="250" y2="246" style="stroke:#f7874f;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+  <line x1="250" y1="246" x2="250" y2="281" style="stroke:#f7874f;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+  <path d="M246,246 L246,250 L250,250" style="fill:none;stroke:#f7874f;stroke-width:1;opacity:0.8"/>
+
+  <!-- RIGHT energy levels -->
+  <line x1="418" y1="88"  x2="748" y2="88"  style="stroke:#1a1a2e;stroke-width:2.5"/>
+  <line x1="418" y1="220" x2="748" y2="220" style="stroke:#1a1a2e;stroke-width:2.5"/>
+  <line x1="418" y1="352" x2="748" y2="352" style="stroke:#1a1a2e;stroke-width:2.5"/>
+
+  <!-- Arrows -->
+  <line x1="435" y1="350" x2="435" y2="90"  style="stroke:#888;stroke-width:1.5"   marker-end="url(#gArrowGray)"/>
+  <line x1="476" y1="90"  x2="476" y2="350" style="stroke:#4f8ef7;stroke-width:2"  marker-end="url(#gArrowB)"/>
+  <path d="M520,90 L520,110 L526,124 L514,142 L526,160 L514,178 L526,196 L514,214 L526,232 L514,250 L526,268 L520,284 L520,350"
+        style="fill:none;stroke:#f74f6a;stroke-width:1.5" marker-end="url(#gArrowR)"/>
+  <path d="M573,90 C558,126 552,170 564,218"  style="fill:none;stroke:#f7874f;stroke-width:2" marker-end="url(#gArrowO)"/>
+  <path d="M610,218 C624,178 622,132 606,90"  style="fill:none;stroke:#4caf88;stroke-width:2" marker-end="url(#gArrowG)"/>
+  <path d="M662,222 L662,242 L668,256 L656,274 L668,292 L656,310 L662,326 L662,350"
+        style="fill:none;stroke:#f74f6a;stroke-width:1.5" marker-end="url(#gArrowR)"/>
+  <text x="453" y="245" style="fill:#4f8ef7;font-size:14px;">hν</text>
+
+  <!-- ═══ ALL TEXT LAST ═══ -->
+
+  <!-- LEFT panel titles -->
+  <text x="186" y="28"  text-anchor="middle" style="fill:#1a1a2e;font-size:15px;font-weight:700;">Measurable Observables</text>
+  <text x="186" y="46"  text-anchor="middle" style="fill:#666;font-size:12px;">(biexponential TRPL fit)</text>
+
+  <!-- Axis labels -->
+  <text x="215" y="352" text-anchor="middle" style="fill:#666;font-size:13px;">Time (t)</text>
+  <text x="24"  y="195" text-anchor="middle" transform="rotate(-90,24,195)" style="fill:#666;font-size:13px;">ln I(t)</text>
+
+  <!-- B labels -->
+  <text x="75" y="76"  text-anchor="end" style="fill:#4caf88;font-size:15px;font-weight:700;">B<tspan dy="5" font-size="10">PF</tspan></text>
+  <text x="75" y="220" text-anchor="end" style="fill:#f7874f;font-size:15px;font-weight:700;">B<tspan dy="5" font-size="10">DF</tspan></text>
+
+  <!-- k_PF annotation -->
+  <text x="155" y="136" style="fill:#4caf88;font-size:17px;font-weight:700;">k<tspan dy="5" font-size="12">PF</tspan></text>
+  <text x="155" y="157" style="fill:#4caf88;font-size:13px;">= 1/τ<tspan dy="4" font-size="10">PF</tspan></text>
+  <text x="155" y="174" style="fill:#4caf88;font-size:12px;opacity:0.8;">= |slope|</text>
+
+  <!-- k_DF annotation -->
+  <text x="258" y="248" style="fill:#f7874f;font-size:17px;font-weight:700;">k<tspan dy="5" font-size="12">DF</tspan></text>
+  <text x="258" y="269" style="fill:#f7874f;font-size:13px;">= 1/τ<tspan dy="4" font-size="10">DF</tspan></text>
+  <text x="258" y="286" style="fill:#f7874f;font-size:12px;opacity:0.8;">= |slope|</text>
+
+  <!-- Φ labels -->
+  <text x="108" y="200" text-anchor="middle" style="fill:#1c7a4a;font-size:19px;font-weight:700;">Φ<tspan dy="6" font-size="13">PF</tspan></text>
+  <text x="260" y="318" text-anchor="middle" style="fill:#9c4208;font-size:19px;font-weight:700;">Φ<tspan dy="6" font-size="13">DF</tspan></text>
+
+  <!-- Formulae -->
+  <text x="186" y="378" text-anchor="middle" style="fill:#666;font-size:12.5px;">I(t) = B<tspan dy="4" font-size="9">PF</tspan><tspan dy="-4">·e</tspan><tspan dy="-5" font-size="9">−k<tspan dy="3" font-size="7">PF</tspan><tspan dy="-3">t</tspan></tspan><tspan dy="5"> + B</tspan><tspan dy="4" font-size="9">DF</tspan><tspan dy="-4">·e</tspan><tspan dy="-5" font-size="9">−k<tspan dy="3" font-size="7">DF</tspan><tspan dy="-3">t</tspan></tspan></text>
+  <text x="186" y="400" text-anchor="middle" style="fill:#666;font-size:12.5px;">ln I(t) = const − k·t  →  slope = −k ,  τ = 1/k</text>
+
+  <!-- RIGHT panel titles -->
+  <text x="574" y="28"  text-anchor="middle" style="fill:#1a1a2e;font-size:15px;font-weight:700;">Intrinsic Rate Constants</text>
+  <text x="574" y="46"  text-anchor="middle" style="fill:#666;font-size:12px;">(unmeasurable — derived from 3-level model)</text>
+
+  <!-- State labels -->
+  <text x="412" y="94"  text-anchor="end" style="fill:#1a1a2e;font-size:16px;font-weight:700;">S₁</text>
+  <text x="412" y="226" text-anchor="end" style="fill:#1a1a2e;font-size:16px;font-weight:700;">T₁</text>
+  <text x="412" y="358" text-anchor="end" style="fill:#1a1a2e;font-size:16px;font-weight:700;">S₀</text>
+
+  <!-- k_s / k_t formulae -->
+  <text x="746" y="83"  text-anchor="end" style="fill:#666;font-size:13px;">k<tspan dy="3" font-size="9">s</tspan><tspan dy="-3"> = k</tspan><tspan dy="3" font-size="9">sr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">snr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">ISC</tspan></text>
+  <text x="746" y="215" text-anchor="end" style="fill:#666;font-size:13px;">k<tspan dy="3" font-size="9">t</tspan><tspan dy="-3"> = k</tspan><tspan dy="3" font-size="9">Tnr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">RISC</tspan></text>
+
+  <!-- hν_exc -->
+  <text x="440" y="280" style="fill:#888;font-size:13px;">hν<tspan dy="4" font-size="9">exc</tspan></text>
+
+  <!-- Rate constant labels -->
+  <text x="483" y="205" style="fill:#4f8ef7;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">sr</tspan></text>
+  <text x="532" y="202" style="fill:#f74f6a;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">snr</tspan></text>
+  <text x="540" y="163" style="fill:#f7874f;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">ISC</tspan></text>
+  <text x="616" y="163" style="fill:#4caf88;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">RISC</tspan></text>
+  <text x="673" y="290" style="fill:#f74f6a;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">Tnr</tspan></text>
+</svg>

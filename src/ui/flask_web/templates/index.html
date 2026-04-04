@@ -111,7 +111,7 @@
     /* ── Form elements ──────────────────────────────────── */
     .section-label {
       font-size: 0.76rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.09em; color: var(--text-muted);
+      letter-spacing: 0.09em; color: var(--accent);
       margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border);
     }
     .form-label {
@@ -249,7 +249,7 @@
     /* ── Right panel: numeric controls ──────────────────── */
     .ctrl-section-label {
       font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--text-muted);
+      letter-spacing: 0.08em; color: var(--accent);
       margin: 0.6rem 0 0.3rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border);
     }
     .ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 0.5rem; margin-bottom: 0.1rem; }
@@ -347,6 +347,9 @@
     .example-box strong { color: var(--text-main); }
     .ref-list { font-size: 0.82rem; color: var(--text-muted); padding-left: 1.2rem; }
     .ref-list li { margin-bottom: 0.3rem; }
+
+    /* ── Section label (accent color for group headings in panels) ── */
+    .lbl-section { color: var(--accent) !important; font-weight: 600; }
   </style>
   <!-- injected by JS for font-weight on plots -->
   <style id="plot_fw_style"></style>
@@ -362,44 +365,285 @@
     <button class="theory-close" onclick="closeTheory()">✕</button>
     <h3>📖 Theoretical Background</h3>
     <div class="theory-body">
-      <h4>1. Three-Level Kinetic Model</h4>
-      <p>A TADF emitter has three states: S₀ (ground), S₁ (singlet), T₁ (triplet). From S₁: radiative emission (k<sub>sr</sub>), non-radiative decay (k<sub>snr</sub>), or ISC (k<sub>ISC</sub>). From T₁: thermally activated RISC (k<sub>RISC</sub>) or non-radiative decay (k<sub>Tnr</sub>).</p>
+
+      <h4>Purpose of This Calculator</h4>
+      <p>In TADF (thermally activated delayed fluorescence) research, we measure the photoluminescence (PL) decay curve and quantum yield of an emitter, and want to know the <strong>intrinsic rate constants</strong> — i.e., how fast does the molecule radiate, how fast does it cross between singlet and triplet states, and how much energy is lost non-radiatively? These intrinsic rates cannot be read directly from any single measurement; they must be <em>extracted</em> by fitting the measured data to a kinetic model. This calculator performs that extraction.</p>
+
+      <h4>How to Read the Results</h4>
+      <p>From a standard TRPL + PLQY experiment, we obtain four measurable quantities: τ<sub>PF</sub>, τ<sub>DF</sub>, Φ<sub>PF</sub>, Φ<sub>DF</sub>. However, the three-level kinetic model contains <strong>five</strong> independent intrinsic rate constants (k<sub>sr</sub>, k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>RISC</sub>, k<sub>Tnr</sub>). Four equations cannot uniquely solve five unknowns — the system is <strong>underdetermined</strong>.</p>
+      <p>Three of the five unknowns (k<sub>sr</sub>, k<sub>s</sub>, k<sub>t</sub>) plus the <em>product</em> k<sub>ISC</sub>·k<sub>RISC</sub> can be determined directly from the data. But k<sub>ISC</sub> and k<sub>RISC</sub> cannot be separated without an additional constraint. To resolve this, we introduce a sweep parameter <strong>Φ<sub>Tnr</sub></strong> — the fraction of total PL loss attributed to the triplet non-radiative channel (T₁→S₀). By varying Φ<sub>Tnr</sub> from 0 to its physical maximum, the calculator produces a <strong>family of solutions</strong> showing how each rate constant depends on this unknown parameter.</p>
+      <p>The output plot therefore shows all rate constants as <em>functions of Φ<sub>Tnr</sub></em>. The two ends of the sweep correspond to two commonly used assumptions in the literature:</p>
+
+      <!-- Φ_Tnr number line diagram -->
+      <svg viewBox="0 0 600 120" style="width:100%;max-width:560px;display:block;margin:0.6rem auto;font-family:'Segoe UI',system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main axis line -->
+        <line x1="60" y1="65" x2="540" y2="65" style="stroke:var(--text-main);stroke-width:2"/>
+        <!-- Left tick -->
+        <line x1="80" y1="55" x2="80" y2="75" style="stroke:var(--text-main);stroke-width:2"/>
+        <!-- Right tick -->
+        <line x1="520" y1="55" x2="520" y2="75" style="stroke:var(--text-main);stroke-width:2"/>
+        <!-- Arrow on right end -->
+        <polygon points="540,65 532,60 532,70" style="fill:var(--text-main)"/>
+
+        <!-- Φ_Tnr labels below axis -->
+        <text x="80" y="95" text-anchor="middle" style="fill:var(--accent);font-size:14px;font-weight:700;">Φ<tspan dy="4" font-size="10">Tnr</tspan><tspan dy="-4"> = 0</tspan></text>
+        <text x="520" y="95" text-anchor="middle" style="fill:var(--accent);font-size:14px;font-weight:700;">Φ<tspan dy="4" font-size="10">Tnr</tspan><tspan dy="-4"> = max</tspan></text>
+
+        <!-- Φ_Snr labels above axis (inverse relationship) -->
+        <text x="80" y="38" text-anchor="middle" style="fill:#f74f6a;font-size:13px;font-weight:600;">Φ<tspan dy="4" font-size="9">Snr</tspan><tspan dy="-4"> = max</tspan></text>
+        <text x="520" y="38" text-anchor="middle" style="fill:#f74f6a;font-size:13px;font-weight:600;">Φ<tspan dy="4" font-size="9">Snr</tspan><tspan dy="-4"> = 0</tspan></text>
+
+        <!-- Descriptive annotations below ticks -->
+        <text x="80" y="115" text-anchor="middle" style="fill:var(--text-muted);font-size:11px;">loss in S₁</text>
+        <text x="520" y="115" text-anchor="middle" style="fill:var(--text-muted);font-size:11px;">loss in T₁</text>
+
+        <!-- Bidirectional arrow showing trade-off -->
+        <line x1="140" y1="18" x2="460" y2="18" style="stroke:var(--text-muted);stroke-width:1;stroke-dasharray:4,3"/>
+        <polygon points="140,18 148,14 148,22" style="fill:var(--text-muted)"/>
+        <polygon points="460,18 452,14 452,22" style="fill:var(--text-muted)"/>
+        <text x="300" y="14" text-anchor="middle" style="fill:var(--text-muted);font-size:11px;">Φ<tspan dy="3" font-size="8">Snr</tspan><tspan dy="-3"> + Φ</tspan><tspan dy="3" font-size="8">Tnr</tspan><tspan dy="-3"> = 1 − PLQY (constant)</tspan></text>
+      </svg>
+
+      <p style="font-size:0.84rem;color:var(--text-muted);">Since the total non-radiative loss is fixed by the measured PLQY (= Φ<sub>PF</sub> + Φ<sub>DF</sub>), the non-radiative loss is a trade-off between the singlet channel (Φ<sub>Snr</sub>) and the triplet channel (Φ<sub>Tnr</sub>). Moving along the x-axis of the output plot from left to right shifts the non-radiative loss from S₁ to T₁. In practice, use physical intuition or additional experimental evidence to identify the relevant Φ<sub>Tnr</sub> range for your material.</p>
+
+      <h4>1. The Three-Level Model</h4>
+      <p>A TADF emitter is described by three electronic states (S₀, S₁, T₁) and five intrinsic rate constants (k<sub>sr</sub>, k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>RISC</sub>, k<sub>Tnr</sub>). See the <strong>📐 Guide</strong> diagram in the left panel for a visual overview of all states, transitions, and their physical meanings.</p>
+      <p>The total depopulation rates for each excited state are:</p>
       <div class="eq-block">
-        dS₁/dt = −k<sub>s</sub>·S₁ + k<sub>RISC</sub>·T₁ + αG<br>
-        dT₁/dt = k<sub>ISC</sub>·S₁ − k<sub>t</sub>·T₁ + (1−α)G<br>
-        <span style="font-size:0.82rem;color:var(--text-muted);">k<sub>s</sub> = k<sub>sr</sub>+k<sub>snr</sub>+k<sub>ISC</sub> &nbsp; k<sub>t</sub> = k<sub>Tnr</sub>+k<sub>RISC</sub></span>
+        k<sub>s</sub> = k<sub>sr</sub> + k<sub>snr</sub> + k<sub>ISC</sub> &nbsp;&nbsp;(total singlet decay rate)<br>
+        k<sub>t</sub> = k<sub>Tnr</sub> + k<sub>RISC</sub> &nbsp;&nbsp;(total triplet decay rate)
       </div>
-      <p>PL decay: I(t) = B<sub>PF</sub>·e<sup>−t/τ<sub>PF</sub></sup> + B<sub>DF</sub>·e<sup>−t/τ<sub>DF</sub></sup>. Eigenvalues of the coupled S₁/T₁ system:</p>
+      <p>The coupled rate equations governing the S₁ and T₁ populations are:</p>
       <div class="eq-block">
-        k<sub>PF</sub> = 1/τ<sub>PF</sub> = (k<sub>s</sub>+k<sub>t</sub>+Δ)/2<br>
-        k<sub>DF</sub> = 1/τ<sub>DF</sub> = (k<sub>s</sub>+k<sub>t</sub>−Δ)/2<br>
-        Δ = √[(k<sub>s</sub>−k<sub>t</sub>)² + 4·k<sub>ISC</sub>·k<sub>RISC</sub>]
+        dS₁/dt = −k<sub>s</sub>·S₁ + k<sub>RISC</sub>·T₁ + α·G<br>
+        dT₁/dt = k<sub>ISC</sub>·S₁ − k<sub>t</sub>·T₁ + (1−α)·G
       </div>
-      <h4>2. Directly Determined Constants</h4>
+      <p style="font-size:0.84rem;color:var(--text-muted);margin-top:0.3rem;">
+        <strong>α</strong> = fraction of excitons initially created as singlets.
+        For PL (optical excitation), α = 1 because photons always produce singlets.
+        For EL (electrical excitation in OLEDs), α ≈ 0.25 due to spin statistics (25% singlet, 75% triplet).
+        <strong>G</strong> = exciton generation rate (relevant only during steady-state excitation; G = 0 for pulsed transient PL after the pulse).
+      </p>
+
+      <h4>2. What We Measure: Transient PL</h4>
+      <p>In a time-resolved PL (TRPL) experiment, a short laser pulse creates S₁ excitons (G = 0 after the pulse, α = 1). The fluorescence intensity I(t) is proportional to [S₁](t). Solving the coupled equations yields a <strong>biexponential decay</strong>:</p>
+      <div class="eq-block">
+        I(t) = B<sub>PF</sub>·e<sup>−k<sub>PF</sub>·t</sup> + B<sub>DF</sub>·e<sup>−k<sub>DF</sub>·t</sup>
+      </div>
+      <p>The two decay rate constants k<sub>PF</sub> and k<sub>DF</sub> are the <strong>eigenvalues</strong> of the coupled S₁–T₁ system:</p>
+      <div class="eq-block">
+        k<sub>PF</sub> = 1/τ<sub>PF</sub> = (k<sub>s</sub> + k<sub>t</sub> + Δ) / 2<br>
+        k<sub>DF</sub> = 1/τ<sub>DF</sub> = (k<sub>s</sub> + k<sub>t</sub> − Δ) / 2<br>
+        Δ = √[(k<sub>s</sub> − k<sub>t</sub>)² + 4·k<sub>ISC</sub>·k<sub>RISC</sub>]
+      </div>
+      <p style="font-size:0.84rem;color:var(--text-muted);">The fast component (PF) is dominated by direct S₁ emission; the slow component (DF) arises from excitons recycled through T₁ via ISC/RISC. From the TRPL fit and PLQY measurement, we obtain four measurable observables: τ<sub>PF</sub>, τ<sub>DF</sub>, Φ<sub>PF</sub>, Φ<sub>DF</sub> — see the <strong>📐 Guide</strong> for details on each quantity.</p>
+
+      <h4>3. Extracting Intrinsic Rate Constants</h4>
+      <p>From k<sub>PF</sub>, k<sub>DF</sub>, Φ<sub>PF</sub>, Φ<sub>DF</sub>, four <strong>directly determined quantities</strong> can be obtained without any assumptions:</p>
       <div class="eq-block">
         k<sub>sr</sub> = k<sub>PF</sub>·Φ<sub>PF</sub> + k<sub>DF</sub>·Φ<sub>DF</sub><br>
-        k<sub>s</sub>  = (k<sub>PF</sub>²·Φ<sub>PF</sub> + k<sub>DF</sub>²·Φ<sub>DF</sub>) / k<sub>sr</sub><br>
-        k<sub>t</sub>  = (Φ<sub>PF</sub>+Φ<sub>DF</sub>)·k<sub>PF</sub>·k<sub>DF</sub> / k<sub>sr</sub><br>
-        k<sub>ISC</sub>·k<sub>RISC</sub> = Φ<sub>PF</sub>·Φ<sub>DF</sub>·k<sub>PF</sub>·k<sub>DF</sub>·(k<sub>PF</sub>−k<sub>DF</sub>)² / k<sub>sr</sub>²
+        k<sub>s</sub> = (k<sub>PF</sub>²·Φ<sub>PF</sub> + k<sub>DF</sub>²·Φ<sub>DF</sub>) / k<sub>sr</sub><br>
+        k<sub>t</sub> = (Φ<sub>PF</sub> + Φ<sub>DF</sub>)·k<sub>PF</sub>·k<sub>DF</sub> / k<sub>sr</sub><br>
+        k<sub>ISC</sub>·k<sub>RISC</sub> = Φ<sub>PF</sub>·Φ<sub>DF</sub>·k<sub>PF</sub>·k<sub>DF</sub>·(k<sub>PF</sub> − k<sub>DF</sub>)² / k<sub>sr</sub>²
       </div>
-      <h4>3. Φ<sub>Tnr</sub> Sweep</h4>
+      <p>However, four observables alone cannot uniquely determine all five intrinsic rate constants (k<sub>sr</sub>, k<sub>snr</sub>, k<sub>ISC</sub>, k<sub>RISC</sub>, k<sub>Tnr</sub>) — the system is <strong>underdetermined</strong>. We know the <em>product</em> k<sub>ISC</sub>·k<sub>RISC</sub> but not each one individually.</p>
+
+      <h4>4. The Φ<sub>Tnr</sub> Sweep: Resolving the Ambiguity</h4>
+      <p>To separate k<sub>ISC</sub> and k<sub>RISC</sub>, one additional constraint is needed. This calculator parameterizes the remaining degree of freedom by <strong>Φ<sub>Tnr</sub></strong>, the fraction of total PL loss that occurs via the triplet non-radiative channel (T₁→S₀). By sweeping Φ<sub>Tnr</sub> from 0 to its physical upper bound, we obtain a <em>family of solutions</em>:</p>
       <div class="eq-block">
         k<sub>ISC</sub> = (k<sub>ISC</sub>·k<sub>RISC</sub> + Φ<sub>Tnr</sub>·k<sub>PF</sub>·k<sub>DF</sub>) / k<sub>t</sub><br>
         k<sub>RISC</sub> = (k<sub>ISC</sub>·k<sub>RISC</sub>) / k<sub>ISC</sub><br>
-        k<sub>snr</sub> = k<sub>s</sub> − k<sub>sr</sub> − k<sub>ISC</sub>
+        k<sub>snr</sub> = k<sub>s</sub> − k<sub>sr</sub> − k<sub>ISC</sub><br>
+        k<sub>Tnr</sub> = k<sub>t</sub> − k<sub>RISC</sub>
       </div>
-      <h4>4. Efficiencies</h4>
+      <p style="font-size:0.84rem;color:var(--text-muted);">The two limiting cases commonly used in the literature are: (i) Φ<sub>Tnr</sub> ≈ 0 (i.e., k<sub>snr</sub> ≪ k<sub>sr</sub>, k<sub>ISC</sub> — negligible singlet non-radiative loss, valid for high-PLQY emitters), and (ii) k<sub>Tnr</sub> ≪ k<sub>RISC</sub> (nearly all triplet excitons return to S₁ — major non-radiative loss occurs in the singlet state). This calculator does not assume either limit; instead, it plots all rate constants as a function of Φ<sub>Tnr</sub> so the user can evaluate both scenarios.</p>
+
+      <h4>5. Efficiencies</h4>
+      <p>Once the rate constants are known, the branching ratios (efficiencies) of each pathway are:</p>
       <div class="eq-block">
-        Φ<sub>sr</sub> = k<sub>sr</sub>/k<sub>s</sub>, &nbsp; Φ<sub>ISC</sub> = k<sub>ISC</sub>/k<sub>s</sub><br>
-        Φ<sub>RISC</sub> = k<sub>RISC</sub>/k<sub>t</sub>, &nbsp; PLQY = Φ<sub>sr</sub>/(1−Φ<sub>ISC</sub>·Φ<sub>RISC</sub>)
+        Φ<sub>sr</sub> = k<sub>sr</sub> / k<sub>s</sub> &nbsp;&nbsp;(singlet radiative efficiency)<br>
+        Φ<sub>ISC</sub> = k<sub>ISC</sub> / k<sub>s</sub> &nbsp;&nbsp;(ISC efficiency)<br>
+        Φ<sub>RISC</sub> = k<sub>RISC</sub> / k<sub>t</sub> &nbsp;&nbsp;(RISC efficiency)<br>
+        PLQY = Φ<sub>sr</sub> / (1 − Φ<sub>ISC</sub>·Φ<sub>RISC</sub>)
       </div>
+      <p style="font-size:0.84rem;color:var(--text-muted);">The PLQY formula reflects the geometric series of singlet–triplet recycling: each ISC→RISC cycle returns a fraction Φ<sub>ISC</sub>·Φ<sub>RISC</sub> of excitons back to S₁, where they get another chance to emit.</p>
+
       <h4>References</h4>
-      <ol class="ref-list">
-        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2015</li>
-        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2016</li>
-        <li>Wu et al., <em>ACS Photonics</em> 2016</li>
-        <li>Wu et al., <em>Adv. Funct. Mater.</em> 2017</li>
+      <ol class="ref-list" style="font-size:0.82rem;">
+        <li>W.-L. Tsai, M.-H. Huang, W.-K. Lee, Y.-J. Hsu, K.-C. Pan, Y.-H. Huang, H.-C. Ting, M. Sarma, Y.-Y. Ho, H.-C. Hu, C.-C. Chen, M.-T. Lee, K.-T. Wong, C.-C. Wu, <em>Chem. Commun.</em> <strong>2015</strong>, 51, 13662–13665. DOI: <a href="https://doi.org/10.1039/C5CC05022G" target="_blank" style="color:var(--accent);">10.1039/C5CC05022G</a></li>
+        <li>K.-C. Pan, S.-W. Li, Y.-Y. Ho, Y.-J. Shiu, W.-L. Tsai, M. Jiao, W.-K. Lee, C.-C. Wu, C.-L. Chung, T. Chatterjee, Y.-S. Li, K.-T. Wong, H.-C. Hu, C.-C. Chen, M.-T. Lee, <em>Adv. Funct. Mater.</em> <strong>2016</strong>, 26, 7560–7571. DOI: <a href="https://doi.org/10.1002/adfm.201602501" target="_blank" style="color:var(--accent);">10.1002/adfm.201602501</a></li>
+        <li>T.-A. Lin, T. Chatterjee, W.-L. Tsai, W.-K. Lee, M.-J. Wu, M. Jiao, K.-C. Pan, C.-L. Yi, C.-L. Chung, K.-T. Wong, C.-C. Wu, <em>Adv. Mater.</em> <strong>2016</strong>, 28, 6976–6983. DOI: <a href="https://doi.org/10.1002/adma.201601675" target="_blank" style="color:var(--accent);">10.1002/adma.201601675</a></li>
+        <li>W. Zeng, H.-Y. Lai, W.-K. Lee, M. Jiao, Y.-J. Shiu, C. Zhong, S. Gong, T. Zhou, G. Xie, M. Sarma, K.-T. Wong, C.-C. Wu, C. Yang, <em>Adv. Mater.</em> <strong>2018</strong>, 30, 1704961. DOI: <a href="https://doi.org/10.1002/adma.201704961" target="_blank" style="color:var(--accent);">10.1002/adma.201704961</a></li>
+        <li>W.-K. Lee, "Investigation of Emission Theories of Organic Light-Emitting Materials and Devices, and Their Applications in Emitting Material Analyses and High-Efficiency Device Designs," Doctoral Dissertation, National Taiwan University, <strong>2018</strong>. DOI: <a href="https://doi.org/10.6342/NTU201802393" target="_blank" style="color:var(--accent);">10.6342/NTU201802393</a></li>
       </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ── Guide Modal ── -->
+<div class="theory-overlay" id="guide_overlay">
+  <div class="theory-modal" style="max-width:820px;">
+    <button class="theory-close" onclick="closeGuide()">✕</button>
+    <h3>📐 Physical Quantities Guide</h3>
+    <svg viewBox="0 0 760 450" style="width:100%;display:block;font-family:'Segoe UI',system-ui,sans-serif;" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="gArrowB"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#4f8ef7"/></marker>
+        <marker id="gArrowO"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#f7874f"/></marker>
+        <marker id="gArrowR"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#f74f6a"/></marker>
+        <marker id="gArrowG"    markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#4caf88"/></marker>
+        <marker id="gArrowGray" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" style="fill:#888"/></marker>
+      </defs>
+
+      <!-- Panel backgrounds -->
+      <rect x="2" y="2" width="370" height="446" rx="8" style="fill:var(--bg-input);opacity:0.5"/>
+      <rect x="390" y="2" width="368" height="446" rx="8" style="fill:var(--bg-input);opacity:0.5"/>
+
+      <!-- ═══ SHAPES FIRST (text rendered on top at the end) ═══ -->
+
+      <!-- LEFT axes: plot area x=78–352, y=58–332 -->
+      <line x1="78" y1="58" x2="78" y2="332" style="stroke:var(--border);stroke-width:1.5"/>
+      <line x1="78" y1="332" x2="352" y2="332" style="stroke:var(--border);stroke-width:1.5"/>
+      <!-- Axis arrowheads -->
+      <polygon points="78,54 74,62 82,62" style="fill:var(--border)"/>
+      <polygon points="356,332 348,328 348,336" style="fill:var(--border)"/>
+
+      <!-- Φ_DF shaded area (orange, drawn first) -->
+      <!-- Slow component: (78,214)→(352,320), closed to x-axis -->
+      <path d="M78,214 L352,320 L352,332 L78,332 Z" style="fill:rgba(247,135,79,0.22)"/>
+      <!-- Φ_PF shaded area (green, drawn second) -->
+      <!-- Fast component: straight line (78,70)→(215,332) -->
+      <path d="M78,70 L215,332 L78,332 Z" style="fill:rgba(76,175,136,0.25)"/>
+
+      <!-- Slow (DF) dashed component: straight line on log scale -->
+      <line x1="78" y1="214" x2="352" y2="320" style="stroke:#f7874f;stroke-width:2;stroke-dasharray:7,3"/>
+      <!-- Fast (PF) dashed component: straight line on log scale -->
+      <line x1="78" y1="70" x2="215" y2="332" style="stroke:#4caf88;stroke-width:2;stroke-dasharray:7,3"/>
+      <!-- Main biexponential (blue): follows PF line (early), kinks at x≈172, follows DF line (late) -->
+      <!-- PF: y=70+(x-78)*1.912  DF: y=214+(x-78)*0.387  crossover x≈172 -->
+      <polyline points="78,70 83,82 88,88 94,104 100,111 107,129 114,135 121,155 129,164 137,186 146,197 155,221 163,229 170,249 172,247 175,255 180,250 187,261 195,255 205,268 216,263 228,277 241,272 255,288 269,283 284,300 298,294 313,311 327,304 340,320 352,316" style="fill:none;stroke:#4f8ef7;stroke-width:2"/>
+
+      <!-- B_PF tick on y-axis -->
+      <line x1="72" y1="70" x2="81" y2="70" style="stroke:#4caf88;stroke-width:1.5"/>
+      <!-- B_DF tick on y-axis -->
+      <line x1="72" y1="214" x2="81" y2="214" style="stroke:#f7874f;stroke-width:1.5"/>
+
+      <!-- Slope triangle for k_PF on fast line -->
+      <!-- Fast line: (78,70)→(215,332), at x=105: y=70+(105-78)/(215-78)*(332-70)=70+51.6=122 -->
+      <!-- at x=145: y=70+(145-78)/137*262=70+128.2=198 -->
+      <!-- Triangle: (105,122),(145,122),(145,198) right angle at (145,122) -->
+      <line x1="105" y1="122" x2="145" y2="122" style="stroke:#4caf88;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+      <line x1="145" y1="122" x2="145" y2="198" style="stroke:#4caf88;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+      <path d="M141,122 L141,126 L145,126" style="fill:none;stroke:#4caf88;stroke-width:1;opacity:0.8"/>
+
+      <!-- Slope triangle for k_DF on slow line -->
+      <!-- Slow line: (78,214)→(352,320), at x=160: y=214+(160-78)/274*106=214+31.7=246 -->
+      <!-- at x=250: y=214+(250-78)/274*106=214+66.5=281 -->
+      <!-- Triangle: (160,246),(250,246),(250,281) -->
+      <line x1="160" y1="246" x2="250" y2="246" style="stroke:#f7874f;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+      <line x1="250" y1="246" x2="250" y2="281" style="stroke:#f7874f;stroke-width:1;stroke-dasharray:3,2;opacity:0.8"/>
+      <path d="M246,246 L246,250 L250,250" style="fill:none;stroke:#f7874f;stroke-width:1;opacity:0.8"/>
+
+      <!-- RIGHT energy levels: S₁ y=88, T₁ y=220, S₀ y=352 -->
+      <line x1="418" y1="88"  x2="748" y2="88"  style="stroke:var(--text-main);stroke-width:2.5"/>
+      <line x1="418" y1="220" x2="748" y2="220" style="stroke:var(--text-main);stroke-width:2.5"/>
+      <line x1="418" y1="352" x2="748" y2="352" style="stroke:var(--text-main);stroke-width:2.5"/>
+
+      <!-- hν_exc: S₀→S₁ -->
+      <line x1="435" y1="350" x2="435" y2="90" style="stroke:#888;stroke-width:1.5" marker-end="url(#gArrowGray)"/>
+      <!-- k_sr: S₁→S₀ (blue) -->
+      <line x1="476" y1="90" x2="476" y2="350" style="stroke:#4f8ef7;stroke-width:2" marker-end="url(#gArrowB)"/>
+      <!-- k_snr: S₁→S₀ (wavy red) -->
+      <path d="M520,90 L520,110 L526,124 L514,142 L526,160 L514,178 L526,196 L514,214 L526,232 L514,250 L526,268 L520,284 L520,350"
+            style="fill:none;stroke:#f74f6a;stroke-width:1.5" marker-end="url(#gArrowR)"/>
+      <!-- k_ISC: S₁→T₁ (curved orange) -->
+      <path d="M573,90 C558,126 552,170 564,218" style="fill:none;stroke:#f7874f;stroke-width:2" marker-end="url(#gArrowO)"/>
+      <!-- k_RISC: T₁→S₁ (curved green) -->
+      <path d="M610,218 C624,178 622,132 606,90" style="fill:none;stroke:#4caf88;stroke-width:2" marker-end="url(#gArrowG)"/>
+      <!-- k_Tnr: T₁→S₀ (wavy red) -->
+      <path d="M662,222 L662,242 L668,256 L656,274 L668,292 L656,310 L662,326 L662,350"
+            style="fill:none;stroke:#f74f6a;stroke-width:1.5" marker-end="url(#gArrowR)"/>
+      <!-- hν emission from k_sr -->
+      <text x="453" y="245" style="fill:#4f8ef7;font-size:14px;">hν</text>
+
+      <!-- ═══ ALL TEXT LAST so nothing can cover it ═══ -->
+
+      <!-- LEFT panel: titles -->
+      <text x="186" y="28" text-anchor="middle" style="fill:var(--text-main);font-size:15px;font-weight:700;">Measurable Observables</text>
+      <text x="186" y="46" text-anchor="middle" style="fill:var(--text-muted);font-size:12px;">(biexponential TRPL fit)</text>
+
+      <!-- Axis labels -->
+      <text x="215" y="352" text-anchor="middle" style="fill:var(--text-muted);font-size:13px;">Time (t)</text>
+      <text x="24" y="195" text-anchor="middle" transform="rotate(-90,24,195)" style="fill:var(--text-muted);font-size:13px;">ln I(t)</text>
+
+      <!-- B_PF label -->
+      <text x="75" y="76" text-anchor="end" style="fill:#4caf88;font-size:15px;font-weight:700;">B<tspan dy="5" font-size="10">PF</tspan></text>
+      <!-- B_DF label -->
+      <text x="75" y="220" text-anchor="end" style="fill:#f7874f;font-size:15px;font-weight:700;">B<tspan dy="5" font-size="10">DF</tspan></text>
+
+      <!-- k_PF annotation — right of slope triangle (right edge x=145, y=122–198) -->
+      <text x="155" y="136" style="fill:#4caf88;font-size:17px;font-weight:700;">k<tspan dy="5" font-size="12">PF</tspan></text>
+      <text x="155" y="157" style="fill:#4caf88;font-size:13px;">= 1/τ<tspan dy="4" font-size="10">PF</tspan></text>
+      <text x="155" y="174" style="fill:#4caf88;font-size:12px;opacity:0.8;">= |slope|</text>
+
+      <!-- k_DF annotation — right of slope triangle (right edge x=250, y=246–281) -->
+      <text x="258" y="248" style="fill:#f7874f;font-size:17px;font-weight:700;">k<tspan dy="5" font-size="12">DF</tspan></text>
+      <text x="258" y="269" style="fill:#f7874f;font-size:13px;">= 1/τ<tspan dy="4" font-size="10">DF</tspan></text>
+      <text x="258" y="286" style="fill:#f7874f;font-size:12px;opacity:0.8;">= |slope|</text>
+
+      <!-- Φ_PF in green area — moved higher, in PF-only zone -->
+      <text x="108" y="200" text-anchor="middle" style="fill:#1c7a4a;font-size:19px;font-weight:700;">Φ<tspan dy="6" font-size="13">PF</tspan></text>
+      <!-- Φ_DF in orange area — moved left, in DF-only zone (x>215) -->
+      <text x="260" y="318" text-anchor="middle" style="fill:#9c4208;font-size:19px;font-weight:700;">Φ<tspan dy="6" font-size="13">DF</tspan></text>
+
+      <!-- Formula bottom left -->
+      <text x="186" y="378" text-anchor="middle" style="fill:var(--text-muted);font-size:12.5px;">I(t) = B<tspan dy="4" font-size="9">PF</tspan><tspan dy="-4">·e</tspan><tspan dy="-5" font-size="9">−k<tspan dy="3" font-size="7">PF</tspan><tspan dy="-3">t</tspan></tspan><tspan dy="5"> + B</tspan><tspan dy="4" font-size="9">DF</tspan><tspan dy="-4">·e</tspan><tspan dy="-5" font-size="9">−k<tspan dy="3" font-size="7">DF</tspan><tspan dy="-3">t</tspan></tspan></text>
+      <text x="186" y="400" text-anchor="middle" style="fill:var(--text-muted);font-size:12.5px;">ln I(t) = const − k·t  →  slope = −k ,  τ = 1/k</text>
+
+      <!-- RIGHT panel: titles -->
+      <text x="574" y="28" text-anchor="middle" style="fill:var(--text-main);font-size:15px;font-weight:700;">Intrinsic Rate Constants</text>
+      <text x="574" y="46" text-anchor="middle" style="fill:var(--text-muted);font-size:12px;">(unmeasurable — derived from 3-level model)</text>
+
+      <!-- Energy level state labels -->
+      <text x="412" y="94" text-anchor="end" style="fill:var(--text-main);font-size:16px;font-weight:700;">S₁</text>
+      <text x="412" y="226" text-anchor="end" style="fill:var(--text-main);font-size:16px;font-weight:700;">T₁</text>
+      <text x="412" y="358" text-anchor="end" style="fill:var(--text-main);font-size:16px;font-weight:700;">S₀</text>
+
+      <!-- k_s formula above S₁ level line (right-aligned) -->
+      <text x="746" y="83" text-anchor="end" style="fill:var(--text-muted);font-size:13px;">k<tspan dy="3" font-size="9">s</tspan><tspan dy="-3"> = k</tspan><tspan dy="3" font-size="9">sr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">snr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">ISC</tspan></text>
+      <!-- k_t formula above T₁ level line (right-aligned) -->
+      <text x="746" y="215" text-anchor="end" style="fill:var(--text-muted);font-size:13px;">k<tspan dy="3" font-size="9">t</tspan><tspan dy="-3"> = k</tspan><tspan dy="3" font-size="9">Tnr</tspan><tspan dy="-3"> + k</tspan><tspan dy="3" font-size="9">RISC</tspan></text>
+
+      <!-- hν_exc label — moved below T₁ line (was at y=222 = on T₁ line) -->
+      <text x="440" y="280" style="fill:#888;font-size:13px;">hν<tspan dy="4" font-size="9">exc</tspan></text>
+
+      <!-- k_sr and hν labels -->
+      <text x="483" y="205" style="fill:#4f8ef7;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">sr</tspan></text>
+
+      <!-- k_snr label — moved above T₁ line (was at y=222 = on T₁ line) -->
+      <text x="532" y="202" style="fill:#f74f6a;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">snr</tspan></text>
+
+      <!-- k_ISC label -->
+      <text x="540" y="163" style="fill:#f7874f;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">ISC</tspan></text>
+
+      <!-- k_RISC label -->
+      <text x="616" y="163" style="fill:#4caf88;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">RISC</tspan></text>
+
+      <!-- k_Tnr label -->
+      <text x="673" y="290" style="fill:#f74f6a;font-size:15px;font-weight:700;">k<tspan dy="5" font-size="10">Tnr</tspan></text>
+    </svg>
+
+    <!-- Legend rows -->
+    <div style="margin-top:0.9rem;display:grid;grid-template-columns:1fr 1fr;gap:0.28rem 2rem;font-size:0.84rem;color:var(--text-label);">
+      <div><span style="color:#4caf88;font-weight:700;">τ<sub>PF</sub></span> — Prompt lifetime (fast decay, ~ns)</div>
+      <div><span style="color:#4f8ef7;font-weight:700;">k<sub>sr</sub></span> — Radiative rate S₁→S₀ (photon emission)</div>
+      <div><span style="color:#f7874f;font-weight:700;">τ<sub>DF</sub></span> — Delayed lifetime (slow, ~µs)</div>
+      <div><span style="color:#f74f6a;font-weight:700;">k<sub>snr</sub></span> — Non-radiative singlet S₁→S₀</div>
+      <div><span style="color:#4caf88;font-weight:700;">Φ<sub>PF</sub></span> — PLQY fraction from fast (prompt) emission</div>
+      <div><span style="color:#f7874f;font-weight:700;">k<sub>ISC</sub></span> — Intersystem crossing S₁→T₁</div>
+      <div><span style="color:#f7874f;font-weight:700;">Φ<sub>DF</sub></span> — PLQY fraction from slow (delayed) emission</div>
+      <div><span style="color:#4caf88;font-weight:700;">k<sub>RISC</sub></span> — Reverse ISC T₁→S₁ (key TADF step!)</div>
+      <div><span style="color:var(--text-muted);font-weight:700;">B<sub>PF</sub>, B<sub>DF</sub></span> — Biexponential prefactors (∝ component amplitude)</div>
+      <div><span style="color:#f74f6a;font-weight:700;">k<sub>Tnr</sub></span> — Non-radiative triplet T₁→S₀</div>
     </div>
   </div>
 </div>
@@ -430,6 +674,11 @@
   <!-- ══ LEFT PANEL ══ -->
   <div class="col-panel left" id="left_panel">
     <div class="panel-content">
+
+      <!-- Guide button -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:0.55rem;">
+        <button class="hdr-btn" onclick="openGuide()" style="font-size:0.78rem;padding:0.22rem 0.7rem;">📐 Guide</button>
+      </div>
 
       <!-- Decay Parameters -->
       <div class="mb-3">
@@ -809,6 +1058,14 @@ function toggleTheme() {
 function openTheory()  { $('theory_overlay').classList.add('open');    $('btn_theory').classList.add('active'); }
 function closeTheory() { $('theory_overlay').classList.remove('open'); $('btn_theory').classList.remove('active'); }
 $('theory_overlay').addEventListener('click', e => { if (e.target === $('theory_overlay')) closeTheory(); });
+
+// ── Heartbeat: keep server alive while browser tab is open ────────────────────
+setInterval(() => fetch('/api/heartbeat', {method:'POST'}).catch(()=>{}), 3000);
+
+// ── Guide popup ───────────────────────────────────────────────────────────────
+function openGuide()  { $('guide_overlay').classList.add('open'); }
+function closeGuide() { $('guide_overlay').classList.remove('open'); }
+$('guide_overlay').addEventListener('click', e => { if (e.target === $('guide_overlay')) closeGuide(); });
 
 // ── Panel collapse ────────────────────────────────────────────────────────────
 let leftOpen = true, rightOpen = true;
