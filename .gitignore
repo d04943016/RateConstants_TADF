@@ -187,5 +187,5 @@ dist/
 *.spec
 
 # Claude Code internal files
-.claude/worktrees/
+.claude/
 .DS_Store
