@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flask-web",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["src/ui/flask_web/app.py"],
+      "port": 5001
+    }
+  ]
+}
